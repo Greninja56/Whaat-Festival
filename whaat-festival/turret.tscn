@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://2s1e8ejivkgs"]
+
+[ext_resource type="Script" uid="uid://c5lfm0pae5yml" path="res://turret.gd" id="1_3oylf"]
+[ext_resource type="PackedScene" uid="uid://cah811pl7ulml" path="res://bullet.tscn" id="2_c5apd"]
+[ext_resource type="Texture2D" uid="uid://btvj8elnj06ky" path="res://icon.svg" id="2_tjdg3"]
+
+[node name="Turret" type="Node2D" unique_id=689885630]
+script = ExtResource("1_3oylf")
+bullet_scene = ExtResource("2_c5apd")
+
+[node name="Node2D" type="Node2D" parent="." unique_id=944148653]
+
+[node name="Visual" type="Sprite2D" parent="Node2D" unique_id=367961007]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_tjdg3")
+
+[node name="Gun" type="Marker2D" parent="." unique_id=125773595]
+unique_name_in_owner = true
+position = Vector2(0, -30)
