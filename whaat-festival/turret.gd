@@ -2,7 +2,6 @@ class_name Turret
 extends Node2D
 
 signal status_changed(text: String)
-#hi
 @export var bullet_scene: PackedScene
 
 @export var max_angle_deg := 80.0
