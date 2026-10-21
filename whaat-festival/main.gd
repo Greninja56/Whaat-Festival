@@ -9,14 +9,30 @@ var elapsed := 0.0
 var spawn_timer := 1.0
 var game_over := false
 var ammo_label: Label
-@export var spawn_start := 5    # seconds between enemies at the start
+@export var max_lives := 5
+@export var spawn_start := 5.0    # seconds between enemies at the start
 @export var spawn_min := 1.0      # fastest it ever gets
-@export var spawn_ramp := 0.01    # how fast it speeds up (seconds saved per second played)
+@export var spawn_ramp := 0.01    # seconds saved per second played
 
 
 func _ready() -> void:
 	var size := get_viewport_rect().size
 	turret.position = Vector2(size.x / 2.0, size.y - 40.0)
+
+	lives = max_lives
+
+	# HUD: a CanvasLayer keeps the label fixed on screen
+	var hud := CanvasLayer.new()
+	add_child(hud)
+	label = Label.new()
+	label.add_theme_font_size_override("font_size", 24)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	hud.add_child(label)
+	label.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	label.offset_right = -16   # padding from the right edge
+	label.offset_top = 12      # padding from the top
+
+	_update_label()
 
 
 func _process(delta: float) -> void:
@@ -43,8 +59,11 @@ func _spawn_enemy() -> void:
 
 
 func _on_enemy_reached_bottom() -> void:
+	if game_over:
+		return
 	lives -= 1
 	if lives <= 0:
+		lives = 0
 		_end_game()
 	_update_label()
 
@@ -60,4 +79,4 @@ func _update_label() -> void:
 	if game_over:
 		label.text = "GAME OVER  (Enter to restart)"
 	else:
-		label.text = "Lives: %d" % [lives]
+		label.text = "Lives: %d" % lives
