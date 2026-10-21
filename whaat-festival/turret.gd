@@ -54,7 +54,7 @@ func _process(delta: float) -> void:
 	_update_reload(delta)
 
 	cooldown = maxf(cooldown - delta, 0.0)
-	if hold_to_fire and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and _can_shoot():
+	if hold_to_fire and Input.is_action_pressed("fire") and _can_shoot():
 		_shoot()
 
 
@@ -119,9 +119,7 @@ func _handle(s: Dictionary) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not hold_to_fire and event is InputEventMouseButton \
-			and event.pressed and event.button_index == MOUSE_BUTTON_LEFT \
-			and _can_shoot():
+	if not hold_to_fire and event.is_action_pressed("fire") and _can_shoot():
 		_shoot()
 
 	if event is InputEventKey and event.pressed and not event.echo:
@@ -139,7 +137,6 @@ func _unhandled_input(event: InputEvent) -> void:
 				_switch_to(1)
 			KEY_Q:
 				_switch_to((current + 1) % ammo_types.size())
-
 
 func _switch_to(index: int) -> void:
 	if index == current:
