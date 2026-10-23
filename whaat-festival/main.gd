@@ -3,11 +3,15 @@ extends Node2D
 @export var enemy_scene: PackedScene
 @export var heavy_scene: PackedScene
 @export var cloaked_scene: PackedScene
-@export_range(0.0, 1.0) var heavy_chance := 0.2
-@export_range(0.0, 1.0) var cloaked_chance := 0.5
-@export var heavy_speed_mult := 0.5
+@export_range(0.0, 1.0) var heavy_chance := 0.3
+@export_range(0.0, 1.0) var cloaked_chance := 0.1
+@export var base_hp := 3  # must match max_hp on your normal enemy scene
+@export var heavy_speed_mult := 0.25
+@export var heavy_hp_mult := 5
+@export var cloaked_speed_mult := 0.5
+@export var cloaked_hp_mult := 1
 
-@export var max_lives := 5
+@export var max_lives := 50
 @export var spawn_start := 5.0
 @export var spawn_min := 1.0
 @export var spawn_ramp := 0.01
@@ -16,6 +20,8 @@ extends Node2D
 @onready var label: Label = %LivesLabel
 @onready var spawn_timer: Timer = %SpawnTimer
 @onready var lives := max_lives
+
+@onready var cloaked_sound: AudioStreamPlayer2D = %CloakedSpawn
 
 var elapsed := 0.0
 var game_over := false
@@ -49,12 +55,25 @@ func _spawn_enemy() -> void:
 	var width := get_viewport_rect().size.x
 	var scene := _pick_scene()
 	var e := scene.instantiate() as Enemy
-	var mult := heavy_speed_mult if scene == heavy_scene else 1.0
+
+	var speed_mult := 1.0
+	var hp_mult := 1
+	if scene == heavy_scene:
+		speed_mult = heavy_speed_mult
+		hp_mult = heavy_hp_mult
+	elif scene == cloaked_scene:
+		speed_mult = cloaked_speed_mult
+		hp_mult = cloaked_hp_mult
+
+	e.max_hp = base_hp * hp_mult
 	e.position = Vector2(randf_range(30.0, width - 30.0), -20.0)
-	e.speed = (60.0 + elapsed * 0.8) * mult
+	e.speed = (60.0 + elapsed * 0.8) * speed_mult
 	e.bottom_y = turret.position.y
 	e.reached_bottom.connect(_on_enemy_reached_bottom)
 	add_child(e)
+
+	if scene == cloaked_scene:
+		cloaked_sound.play()
 
 
 func _on_enemy_reached_bottom() -> void:

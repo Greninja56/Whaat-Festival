@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cgcjpp1luc0t3" path="res://enemy.tscn" id="2_h2yge"]
 [ext_resource type="PackedScene" uid="uid://cgi012qqxplg3" path="res://slow_enemy.tscn" id="3_lquwl"]
 [ext_resource type="PackedScene" uid="uid://18cpu6nxqdsn" path="res://hidden_enemy.tscn" id="4_7mycd"]
+[ext_resource type="AudioStream" uid="uid://dwrw148gtdimt" path="res://cloakedSound.mp3" id="6_7mycd"]
 
 [node name="Main Game" type="Node2D" unique_id=295050915]
 script = ExtResource("1_ig7tw")
@@ -39,6 +40,10 @@ unique_name_in_owner = true
 wait_time = 5.0
 one_shot = true
 autostart = true
+
+[node name="CloakedSpawn" type="AudioStreamPlayer2D" parent="." unique_id=336997994]
+unique_name_in_owner = true
+stream = ExtResource("6_7mycd")
 
 [connection signal="status_changed" from="Turret" to="HUD/AmmoLabel" method="set_text"]
 [connection signal="timeout" from="SpawnTimer" to="." method="_on_spawn_timer_timeout"]
