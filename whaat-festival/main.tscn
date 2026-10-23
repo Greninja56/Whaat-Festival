@@ -2,9 +2,11 @@
 
 [ext_resource type="Script" uid="uid://jnj44ghv1yl7" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://2s1e8ejivkgs" path="res://turret.tscn" id="2_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://cgcjpp1luc0t3" path="res://enemy.tscn" id="2_h2yge"]
 
 [node name="Main Game" type="Node2D" unique_id=295050915]
 script = ExtResource("1_ig7tw")
+enemy_scene = ExtResource("2_h2yge")
 
 [node name="Turret" parent="." unique_id=689885630 instance=ExtResource("2_0xm2m")]
 unique_name_in_owner = true
@@ -18,4 +20,21 @@ offset_right = 40.0
 offset_bottom = 23.0
 theme_override_font_sizes/font_size = 24
 
+[node name="LivesLabel" type="Label" parent="HUD" unique_id=729361949]
+unique_name_in_owner = true
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+pivot_offset = Vector2(-16, 12)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 2
+
+[node name="SpawnTimer" type="Timer" parent="." unique_id=795384298]
+unique_name_in_owner = true
+wait_time = 5.0
+one_shot = true
+autostart = true
+
 [connection signal="status_changed" from="Turret" to="HUD/AmmoLabel" method="set_text"]
+[connection signal="timeout" from="SpawnTimer" to="." method="_on_spawn_timer_timeout"]

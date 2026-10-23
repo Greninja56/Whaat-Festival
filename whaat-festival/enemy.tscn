@@ -6,7 +6,8 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_vpvrv"]
 radius = 14.0
 
-[node name="Enemy" type="Area2D" unique_id=970148408]
+[node name="Enemy" type="Area2D" unique_id=970148408 groups=["enemies"]]
+collision_mask = 0
 script = ExtResource("1_4gyqm")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=730993054]

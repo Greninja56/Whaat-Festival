@@ -3,10 +3,13 @@
 [ext_resource type="Script" uid="uid://c5lfm0pae5yml" path="res://turret.gd" id="1_3oylf"]
 [ext_resource type="PackedScene" uid="uid://cah811pl7ulml" path="res://bullet.tscn" id="2_c5apd"]
 [ext_resource type="Texture2D" uid="uid://btvj8elnj06ky" path="res://icon.svg" id="2_tjdg3"]
+[ext_resource type="PackedScene" uid="uid://dvcb1ooiidfb1" path="res://sonar_shot.tscn" id="3_coqkk"]
 
 [node name="Turret" type="Node2D" unique_id=689885630]
+position = Vector2(576, 608)
 script = ExtResource("1_3oylf")
 bullet_scene = ExtResource("2_c5apd")
+sonar_scene = ExtResource("3_coqkk")
 
 [node name="Node2D" type="Node2D" parent="." unique_id=944148653]
 

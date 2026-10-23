@@ -2,7 +2,9 @@ class_name Turret
 extends Node2D
 
 signal status_changed(text: String)
+
 @export var bullet_scene: PackedScene
+@export var bullet_parent: Node
 
 @export var max_angle_deg := 80.0
 @export var physical_range_deg := 80.0
@@ -12,8 +14,16 @@ signal status_changed(text: String)
 @export var key_speed_deg := 120.0
 @export var key_hold_ms := 300
 @export var debug_print := false
-@export var bullet_parent: Node
 @export var hold_to_fire := true
+
+@export var sonar_scene: PackedScene
+@export var sonar_speed := 500.0
+@export var sonar_max_charges := 3
+@export var sonar_full_recharge_time := 20.0
+var sonar_charges := 0
+var sonar_progress := 0.0
+
+@onready var gun: Marker2D = %Gun
 
 var ammo_types: Array[Dictionary] = [
 	{"name": "Standard", "damage": 1, "mag": 30, "fire_rate": 8.0,
@@ -21,8 +31,6 @@ var ammo_types: Array[Dictionary] = [
 	{"name": "Heavy", "damage": 3, "mag": 6, "fire_rate": 2.0,
 	 "reload": 2.0, "speed": 450.0, "color": Color(1.0, 0.4, 0.2)},
 ]
-
-@onready var gun: Marker2D = %Gun
 
 var udp := PacketPeerUDP.new()
 var cooldown := 0.0
@@ -44,6 +52,7 @@ func _ready() -> void:
 		push_error("Could not bind UDP port %d" % port)
 	for a in ammo_types:
 		mags.append(a["mag"])
+	sonar_charges = sonar_max_charges
 	status_changed.emit.call_deferred(status_text())
 
 
@@ -52,6 +61,7 @@ func _process(delta: float) -> void:
 	_read_keyboard(delta)
 	rotation = lerp_angle(rotation, target_angle, 1.0 - exp(-smooth * delta))
 	_update_reload(delta)
+	_update_sonar(delta)
 
 	cooldown = maxf(cooldown - delta, 0.0)
 	if hold_to_fire and Input.is_action_pressed("fire") and _can_shoot():
@@ -121,25 +131,25 @@ func _handle(s: Dictionary) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not hold_to_fire and event.is_action_pressed("fire") and _can_shoot():
 		_shoot()
+	elif event.is_action_pressed("center"):
+		center_yaw = raw_yaw
+		target_angle = 0.0
+	elif event.is_action_pressed("flip"):
+		flip = -flip
+	elif event.is_action_pressed("reload"):
+		_start_reload()
+	elif event.is_action_pressed("ammo_1"):
+		_switch_to(0)
+	elif event.is_action_pressed("ammo_2"):
+		_switch_to(1)
+	elif event.is_action_pressed("ammo_next"):
+		_switch_to((current + 1) % ammo_types.size())
+	elif event.is_action_pressed("sonar") and sonar_charges > 0:
+		_fire_sonar()
 
-	if event is InputEventKey and event.pressed and not event.echo:
-		match event.keycode:
-			KEY_C:
-				center_yaw = raw_yaw
-				target_angle = 0.0
-			KEY_F:
-				flip = -flip
-			KEY_R:
-				_start_reload()
-			KEY_1:
-				_switch_to(0)
-			KEY_2:
-				_switch_to(1)
-			KEY_Q:
-				_switch_to((current + 1) % ammo_types.size())
 
 func _switch_to(index: int) -> void:
-	if index == current:
+	if index == current or index >= ammo_types.size():
 		return
 	current = index
 	reload_left = 0.0
@@ -148,10 +158,9 @@ func _switch_to(index: int) -> void:
 
 
 func _start_reload() -> void:
-	var ammo := ammo_types[current]
-	if reload_left > 0.0 or mags[current] >= ammo["mag"]:
+	if reload_left > 0.0 or mags[current] >= ammo_types[current]["mag"]:
 		return
-	reload_left = ammo["reload"]
+	reload_left = ammo_types[current]["reload"]
 	status_changed.emit(status_text())
 
 
@@ -188,4 +197,26 @@ func status_text() -> String:
 			elif mags[i] == 0:
 				line += "  EMPTY - press R"
 		parts.append(line)
+	parts.append("Sonar %d/%d" % [sonar_charges, sonar_max_charges])
 	return "\n".join(parts)
+	
+func _update_sonar(delta: float) -> void:
+	sonar_progress += delta
+	if sonar_progress >= sonar_full_recharge_time:
+		sonar_progress -= sonar_full_recharge_time
+		if sonar_charges < sonar_max_charges:
+			sonar_charges = sonar_max_charges
+			status_changed.emit(status_text())
+
+
+func _fire_sonar() -> void:
+	sonar_charges -= 1
+
+	var s := sonar_scene.instantiate()
+	s.velocity = Vector2.UP.rotated(global_rotation) * sonar_speed
+
+	var parent := bullet_parent if bullet_parent else get_tree().current_scene
+	parent.add_child(s)
+	s.global_position = gun.global_position
+
+	status_changed.emit(status_text())

@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://18cpu6nxqdsn"]
+
+[ext_resource type="PackedScene" uid="uid://cgcjpp1luc0t3" path="res://enemy.tscn" id="1_gkkb1"]
+[ext_resource type="Script" uid="uid://bc8d5comy0ay3" path="res://hidden_enemy.gd" id="2_5ffnc"]
+
+[node name="Enemy" unique_id=970148408 instance=ExtResource("1_gkkb1")]
+script = ExtResource("2_5ffnc")
+cloaked_alpha = 0.0
+reveal_fade_time = 0.3
