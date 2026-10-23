@@ -12,7 +12,7 @@ extends Node2D
 @export var cloaked_hp_mult := 1
 
 @export var max_lives := 50
-@export var spawn_start := 5.0
+@export var spawn_start := 10.0
 @export var spawn_min := 1.0
 @export var spawn_ramp := 0.01
 

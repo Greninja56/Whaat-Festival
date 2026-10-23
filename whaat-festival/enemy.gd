@@ -5,7 +5,7 @@ signal died
 signal reached_bottom
 
 @export var max_hp := 3
-@export var speed := 50.0
+@export var speed := 40.0
 @export var bottom_y := 600.0
 @export var damaged_color := Color(1.0, 0.4, 0.4)
 
