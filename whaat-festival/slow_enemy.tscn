@@ -2,6 +2,10 @@
 
 [ext_resource type="PackedScene" uid="uid://cgcjpp1luc0t3" path="res://enemy.tscn" id="1_12e31"]
 [ext_resource type="Script" uid="uid://bok52ti8plj2w" path="res://slow_enemy.gd" id="2_ji5ft"]
+[ext_resource type="Texture2D" uid="uid://dkuen6ka14280" path="res://bob_builder.jpeg" id="3_ji5ft"]
 
 [node name="Enemy" unique_id=970148408 instance=ExtResource("1_12e31")]
 script = ExtResource("2_ji5ft")
+
+[node name="Body" parent="." index="1" unique_id=914568797]
+texture = ExtResource("3_ji5ft")

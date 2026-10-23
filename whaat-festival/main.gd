@@ -1,6 +1,12 @@
 extends Node2D
 
 @export var enemy_scene: PackedScene
+@export var heavy_scene: PackedScene
+@export var cloaked_scene: PackedScene
+@export_range(0.0, 1.0) var heavy_chance := 0.2
+@export_range(0.0, 1.0) var cloaked_chance := 0.07
+@export var heavy_speed_mult := 0.5
+
 @export var max_lives := 5
 @export var spawn_start := 5.0
 @export var spawn_min := 1.0
@@ -31,12 +37,21 @@ func _on_spawn_timer_timeout() -> void:
 	_spawn_enemy()
 	spawn_timer.start(maxf(spawn_min, spawn_start - elapsed * spawn_ramp))
 
+func _pick_scene() -> PackedScene:
+	var roll := randf()
+	if roll < cloaked_chance:
+		return cloaked_scene
+	if roll < cloaked_chance + heavy_chance:
+		return heavy_scene
+	return enemy_scene
 
 func _spawn_enemy() -> void:
 	var width := get_viewport_rect().size.x
-	var e := enemy_scene.instantiate() as Enemy
+	var scene := _pick_scene()
+	var e := scene.instantiate() as Enemy
+	var mult := heavy_speed_mult if scene == heavy_scene else 1.0
 	e.position = Vector2(randf_range(30.0, width - 30.0), -20.0)
-	e.speed = 60.0 + elapsed * 0.8
+	e.speed = (60.0 + elapsed * 0.8) * mult
 	e.bottom_y = turret.position.y
 	e.reached_bottom.connect(_on_enemy_reached_bottom)
 	add_child(e)
