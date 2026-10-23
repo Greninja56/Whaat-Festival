@@ -7,5 +7,9 @@
 [node name="Enemy" unique_id=970148408 instance=ExtResource("1_12e31")]
 script = ExtResource("2_ji5ft")
 
+[node name="CollisionShape2D" parent="." index="0" unique_id=730993054]
+scale = Vector2(5, 5)
+
 [node name="Body" parent="." index="1" unique_id=914568797]
+scale = Vector2(0.3, 0.3)
 texture = ExtResource("3_ji5ft")

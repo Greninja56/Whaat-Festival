@@ -12,6 +12,7 @@ func _ready() -> void:
 	_apply_visibility()
 
 
+# cloaked_enemy.gd
 func reveal() -> void:
 	if revealed:
 		return

@@ -9,5 +9,9 @@ script = ExtResource("2_5ffnc")
 cloaked_alpha = 0.0
 reveal_fade_time = 0.3
 
+[node name="CollisionShape2D" parent="." index="0" unique_id=730993054]
+scale = Vector2(3, 3)
+
 [node name="Body" parent="." index="1" unique_id=914568797]
+scale = Vector2(0.2, 0.2)
 texture = ExtResource("3_5ffnc")

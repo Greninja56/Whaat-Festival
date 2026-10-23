@@ -3,10 +3,14 @@
 [ext_resource type="Script" uid="uid://jnj44ghv1yl7" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://2s1e8ejivkgs" path="res://turret.tscn" id="2_0xm2m"]
 [ext_resource type="PackedScene" uid="uid://cgcjpp1luc0t3" path="res://enemy.tscn" id="2_h2yge"]
+[ext_resource type="PackedScene" uid="uid://cgi012qqxplg3" path="res://slow_enemy.tscn" id="3_lquwl"]
+[ext_resource type="PackedScene" uid="uid://18cpu6nxqdsn" path="res://hidden_enemy.tscn" id="4_7mycd"]
 
 [node name="Main Game" type="Node2D" unique_id=295050915]
 script = ExtResource("1_ig7tw")
 enemy_scene = ExtResource("2_h2yge")
+heavy_scene = ExtResource("3_lquwl")
+cloaked_scene = ExtResource("4_7mycd")
 
 [node name="Turret" parent="." unique_id=689885630 instance=ExtResource("2_0xm2m")]
 unique_name_in_owner = true
