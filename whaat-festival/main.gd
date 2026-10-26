@@ -39,6 +39,11 @@ extends Node2D
 @onready var hud: CanvasLayer = %HUD   # EFFECT: power failure
 @onready var lives := max_lives
 
+@export var heal_ship_scene: PackedScene
+@export var heal_spawn_min := 5.0   # seconds between heal ships
+@export var heal_spawn_max := 10.0
+var heal_timer := 0.0
+
 var elapsed := 0.0
 var game_over := false
 var currency := 0
@@ -57,6 +62,7 @@ func _ready() -> void:
 	lives_bar.max_value = max_lives
 	lives_bar.value = lives
 	label.visible = false
+	heal_timer = randf_range(heal_spawn_min, heal_spawn_max)
 	_add_currency(0)
 
 
@@ -66,6 +72,10 @@ func _process(delta: float) -> void:
 			get_tree().reload_current_scene()
 		return
 	elapsed += delta
+	heal_timer -= delta
+	if heal_timer <= 0.0:
+		heal_timer = randf_range(heal_spawn_min, heal_spawn_max)
+		_spawn_heal_ship()
 
 	if Input.is_action_just_pressed("launch_ship"):
 		_launch_mini_ship()
@@ -185,6 +195,8 @@ func _end_game() -> void:
 	turret.process_mode = Node.PROCESS_MODE_DISABLED
 	for e in get_tree().get_nodes_in_group("enemies"):
 		e.queue_free()
+	for h in get_tree().get_nodes_in_group("heal_ships"):
+		h.queue_free()
 
 
 func _update_label() -> void:
@@ -218,3 +230,18 @@ func _set_power_failure(on: bool) -> void:
 func _set_hangar_failure(on: bool) -> void:
 	hangar_disabled = on
 	currency_label.modulate = Color(1.0, 0.9, 0.2) if on else Color.WHITE
+
+func _spawn_heal_ship() -> void:
+	var size := get_viewport_rect().size
+	var s := heal_ship_scene.instantiate() as HealShip
+	s.position = Vector2(-40.0, randf_range(size.y * 0.1, size.y * 0.5))
+	s.right_x = size.x + 40.0
+	s.collected.connect(_on_heal_collected)
+	add_child(s)
+
+
+func _on_heal_collected(amount: int) -> void:
+	if game_over:
+		return
+	lives = mini(lives + amount, max_lives)
+	_update_label()

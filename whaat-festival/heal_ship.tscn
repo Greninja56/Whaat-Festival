@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://bwlgqxi2khyct"]
+
+[ext_resource type="Script" uid="uid://dpvve3l3mp6gd" path="res://heal_ship.gd" id="1_nti3q"]
+[ext_resource type="Texture2D" uid="uid://bwnpdlh1ld8ah" path="res://images.png" id="2_vuvdk"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vpvrv"]
+
+[node name="HealShip" type="Area2D" unique_id=1687234795]
+position = Vector2(0, 8)
+scale = Vector2(0.3, 0.3)
+script = ExtResource("1_nti3q")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1400828423]
+texture = ExtResource("2_vuvdk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1311422476]
+scale = Vector2(20, 20)
+shape = SubResource("CircleShape2D_vpvrv")

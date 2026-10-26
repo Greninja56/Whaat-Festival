@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://cgi012qqxplg3" path="res://slow_enemy.tscn" id="3_lquwl"]
 [ext_resource type="PackedScene" uid="uid://18cpu6nxqdsn" path="res://hidden_enemy.tscn" id="4_7mycd"]
 [ext_resource type="PackedScene" uid="uid://cjv8xoatkenqc" path="res://mini_ship.tscn" id="5_272bh"]
+[ext_resource type="PackedScene" uid="uid://bwlgqxi2khyct" path="res://heal_ship.tscn" id="6_5vw27"]
 [ext_resource type="AudioStream" uid="uid://dwrw148gtdimt" path="res://cloakedSound.mp3" id="6_7mycd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7mycd"]
@@ -20,6 +21,7 @@ enemy_scene = ExtResource("2_h2yge")
 heavy_scene = ExtResource("3_lquwl")
 cloaked_scene = ExtResource("4_7mycd")
 mini_ship_scene = ExtResource("5_272bh")
+heal_ship_scene = ExtResource("6_5vw27")
 
 [node name="Turret" parent="." unique_id=689885630 instance=ExtResource("2_0xm2m")]
 unique_name_in_owner = true
