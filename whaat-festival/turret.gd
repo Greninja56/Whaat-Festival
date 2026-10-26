@@ -23,6 +23,9 @@ signal status_changed(text: String)
 var sonar_charges := 0
 var sonar_progress := 0.0
 
+@export var overheat_fire_mult := 0.3   # 0.3 = 30% of normal fire rate
+var overheated := false
+
 @onready var gun: Marker2D = %Gun
 
 var ammo_types: Array[Dictionary] = [
@@ -171,7 +174,10 @@ func _can_shoot() -> bool:
 func _shoot() -> void:
 	var ammo := ammo_types[current]
 	mags[current] -= 1
-	cooldown = 1.0 / ammo["fire_rate"]
+	var rate: float = ammo["fire_rate"]
+	if overheated:
+		rate *= overheat_fire_mult
+	cooldown = 1.0 / rate
 
 	var b := bullet_scene.instantiate() as Bullet
 	b.velocity = Vector2.UP.rotated(global_rotation) * ammo["speed"]
@@ -219,4 +225,9 @@ func _fire_sonar() -> void:
 	parent.add_child(s)
 	s.global_position = gun.global_position
 
+	status_changed.emit(status_text())
+	
+func set_overheated(value: bool) -> void:
+	overheated = value
+	modulate = Color(1.0, 0.3, 0.3) if value else Color.WHITE
 	status_changed.emit(status_text())

@@ -51,6 +51,10 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("fix_oxygen"):
 		_stop_oxygen_leak()
 	_process_oxygen_leak(delta)
+	if Input.is_action_just_pressed("overheat"):
+		turret.set_overheated(true)
+	if Input.is_action_just_pressed("fix_overheat"):
+		turret.set_overheated(false)
 
 
 func _on_spawn_timer_timeout() -> void:
