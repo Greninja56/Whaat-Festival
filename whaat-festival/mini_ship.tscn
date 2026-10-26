@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://cjv8xoatkenqc"]
+
+[ext_resource type="Script" uid="uid://cf5hgaocg652b" path="res://mini_ship.gd" id="1_lek37"]
+[ext_resource type="Texture2D" uid="uid://bvx5c0eilpclk" path="res://images.jpeg" id="2_e10vf"]
+
+[node name="Node2D" type="Node2D" unique_id=1465952765]
+script = ExtResource("1_lek37")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1896365905]
+texture = ExtResource("2_e10vf")
