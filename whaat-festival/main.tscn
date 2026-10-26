@@ -25,6 +25,7 @@ unique_name_in_owner = true
 [node name="Bullets" type="Node2D" parent="." unique_id=1277818847]
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=2084087761]
+unique_name_in_owner = true
 
 [node name="AmmoLabel" type="Label" parent="HUD" unique_id=1495064037]
 offset_right = 40.0

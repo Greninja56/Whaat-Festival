@@ -1,7 +1,7 @@
 class_name Enemy
 extends Area2D
 
-signal died
+signal died(value: int)
 signal reached_bottom
 
 @export var max_hp := 3
@@ -11,6 +11,7 @@ signal reached_bottom
 
 @onready var hp := max_hp
 @onready var visual: Sprite2D = $Body
+var currency_value := 1
 
 
 func _ready() -> void:
@@ -29,7 +30,7 @@ func hit(damage: int) -> void:
 		return
 	hp -= damage
 	if hp <= 0:
-		died.emit()
+		died.emit(currency_value)
 		queue_free()
 	else:
 		_update_color()
