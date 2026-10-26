@@ -17,9 +17,15 @@ extends Node2D
 @export var spawn_ramp := 0.01
 
 @onready var turret: Turret = %Turret
-@onready var label: Label = %LivesLabel
+@onready var lives_bar: ProgressBar = %LivesBar
+@onready var label: Label = %GameOver 
 @onready var spawn_timer: Timer = %SpawnTimer
 @onready var lives := max_lives
+
+@export var oxygen_tick := 1.0
+@export var oxygen_damage := 2
+var oxygen_active := false
+var oxygen_tick_timer := 0.0
 
 @onready var cloaked_sound: AudioStreamPlayer2D = %CloakedSpawn
 
@@ -28,7 +34,9 @@ var game_over := false
 
 
 func _ready() -> void:
-	_update_label()
+	lives_bar.max_value = max_lives
+	lives_bar.value = lives
+	label.visible = false
 
 
 func _process(delta: float) -> void:
@@ -37,6 +45,12 @@ func _process(delta: float) -> void:
 			get_tree().reload_current_scene()
 		return
 	elapsed += delta
+	
+	if Input.is_action_just_pressed("oxygen_leak"):
+		_start_oxygen_leak()
+	if Input.is_action_just_pressed("fix_oxygen"):
+		_stop_oxygen_leak()
+	_process_oxygen_leak(delta)
 
 
 func _on_spawn_timer_timeout() -> void:
@@ -77,11 +91,13 @@ func _spawn_enemy() -> void:
 
 
 func _on_enemy_reached_bottom() -> void:
+	_lose_lives(1)
+
+func _lose_lives(amount: int) -> void:
 	if game_over:
 		return
-	lives -= 1
-	if lives <= 0:
-		lives = 0
+	lives = maxi(lives - amount, 0)
+	if lives == 0:
 		_end_game()
 	_update_label()
 
@@ -89,13 +105,31 @@ func _on_enemy_reached_bottom() -> void:
 func _end_game() -> void:
 	game_over = true
 	spawn_timer.stop()
+	oxygen_active = false
 	turret.process_mode = Node.PROCESS_MODE_DISABLED
 	for e in get_tree().get_nodes_in_group("enemies"):
 		e.queue_free()
 
 
 func _update_label() -> void:
+	lives_bar.value = lives
 	if game_over:
 		label.text = "GAME OVER  (Enter to restart)"
-	else:
-		label.text = "Lives: %d" % lives
+		label.visible = true
+		
+func _start_oxygen_leak() -> void:
+	if oxygen_active:
+		return 
+	oxygen_active = true
+	oxygen_tick_timer = oxygen_tick
+
+func _stop_oxygen_leak() -> void:
+	oxygen_active = false
+	
+func _process_oxygen_leak(delta: float) -> void:
+	if not oxygen_active:
+		return
+	oxygen_tick_timer -= delta
+	if oxygen_tick_timer <= 0.0:
+		oxygen_tick_timer += oxygen_tick
+		_lose_lives(oxygen_damage)
