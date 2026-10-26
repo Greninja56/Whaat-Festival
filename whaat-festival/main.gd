@@ -58,17 +58,40 @@ var hangar_disabled := false
 
 @export var ship_margin := 40.0   # keep ships away from the screen edges
 
+@export var score_normal := 10
+@export var score_heavy := 30
+@export var score_cloaked := 50
+@export var score_fix := 70
+
+const SAVE_PATH := "user://leaderboard.json"
+const MAX_ENTRIES := 10
+
+@onready var score_label: Label = %ScoreLabel
+@onready var leaderboard_label: Label = %Leaderboard
+@onready var name_entry: LineEdit = %EnterName
+
+var score := 0
+var high_score := 0
+var leaderboard: Array = []
+var entering_name := false
+
 func _ready() -> void:
 	lives_bar.max_value = max_lives
 	lives_bar.value = lives
 	label.visible = false
 	heal_timer = randf_range(heal_spawn_min, heal_spawn_max)
 	_add_currency(0)
+	_load_leaderboard()
+	name_entry.visible = false
+	name_entry.max_length = 8
+	name_entry.text_submitted.connect(_on_name_submitted)
+	leaderboard_label.visible = false
+	_add_score(0)
 
 
 func _process(delta: float) -> void:
 	if game_over:
-		if Input.is_action_just_pressed("ui_accept"):
+		if not entering_name and Input.is_action_just_pressed("ui_accept"):
 			get_tree().reload_current_scene()
 		return
 	elapsed += delta
@@ -83,24 +106,29 @@ func _process(delta: float) -> void:
 	# EFFECT inputs
 	if Input.is_action_just_pressed("oxygen_leak"):
 		_start_oxygen_leak()
-	if Input.is_action_just_pressed("fix_oxygen"):
+	if Input.is_action_just_pressed("fix_oxygen") and oxygen_active:
 		oxygen_active = false
+		_add_score(score_fix)
 	if Input.is_action_just_pressed("overheat"):
 		turret.set_overheated(true)
-	if Input.is_action_just_pressed("fix_overheat"):
+	if Input.is_action_just_pressed("fix_overheat") and turret.overheated:
 		turret.set_overheated(false)
+		_add_score(score_fix)
 	if Input.is_action_just_pressed("power_failure"):
 		_set_power_failure(true)
-	if Input.is_action_just_pressed("fix_power"):
+	if Input.is_action_just_pressed("fix_power") and power_active:
 		_set_power_failure(false)
+		_add_score(score_fix)
 	if Input.is_action_just_pressed("shield_failure"):
 		shield_active = true
-	if Input.is_action_just_pressed("fix_shield"):
+	if Input.is_action_just_pressed("fix_shield") and shield_active:
 		shield_active = false
+		_add_score(score_fix)
 	if Input.is_action_just_pressed("hangar_failure"):
 		_set_hangar_failure(true)
-	if Input.is_action_just_pressed("fix_hangar"):
+	if Input.is_action_just_pressed("fix_hangar") and hangar_disabled:
 		_set_hangar_failure(false)
+		_add_score(score_fix)
 	_process_oxygen_leak(delta)
 
 
@@ -126,14 +154,17 @@ func _spawn_enemy() -> void:
 	var speed_mult := 1.0
 	var hp_mult := 1
 	var coins := coin_normal
+	var points := score_normal
 	if scene == heavy_scene:
 		speed_mult = heavy_speed_mult
 		hp_mult = heavy_hp_mult
 		coins = coin_heavy
+		points = score_heavy
 	elif scene == cloaked_scene:
 		speed_mult = cloaked_speed_mult
 		hp_mult = cloaked_hp_mult
 		coins = coin_cloaked
+		points = score_cloaked
 
 	e.max_hp = base_hp * hp_mult
 	e.currency_value = coins
@@ -141,7 +172,7 @@ func _spawn_enemy() -> void:
 	e.speed = (60.0 + elapsed * 0.8) * speed_mult
 	e.bottom_y = turret.position.y
 	e.reached_bottom.connect(_on_enemy_reached_bottom)
-	e.died.connect(_on_enemy_died)
+	e.died.connect(_on_enemy_died.bind(points))
 	add_child(e)
 
 	if scene == cloaked_scene:
@@ -153,8 +184,9 @@ func _on_enemy_reached_bottom() -> void:
 	_lose_lives(roundi(enemy_damage * mult))
 
 
-func _on_enemy_died(value: int) -> void:
+func _on_enemy_died(value: int, points: int) -> void:
 	_add_currency(value)
+	_add_score(points)
 
 
 func _add_currency(amount: int) -> void:
@@ -197,12 +229,19 @@ func _end_game() -> void:
 		e.queue_free()
 	for h in get_tree().get_nodes_in_group("heal_ships"):
 		h.queue_free()
+	if _qualifies():
+		entering_name = true
+		label.text = "GAME OVER  Score: %d\nNew high score! Enter your name:" % score
+		name_entry.text = ""
+		name_entry.visible = true
+		name_entry.grab_focus()
+	else:
+		_show_results()
 
 
 func _update_label() -> void:
 	lives_bar.value = lives
 	if game_over:
-		label.text = "GAME OVER  (Enter to restart)"
 		label.visible = true
 
 
@@ -245,3 +284,59 @@ func _on_heal_collected(amount: int) -> void:
 		return
 	lives = mini(lives + amount, max_lives)
 	_update_label()
+	
+func _add_score(amount: int) -> void:
+	score += amount
+	score_label.text = "Score: %d   Best: %d" % [score, maxi(score, high_score)]
+
+func _qualifies() -> bool:
+	if score <= 0:
+		return false
+	return leaderboard.size() < MAX_ENTRIES or score > int(leaderboard.back()["score"])
+
+
+func _on_name_submitted(text: String) -> void:
+	var player_name := text.strip_edges().to_upper()
+	if player_name == "":
+		player_name = "???"
+	leaderboard.append({"name": player_name, "score": score})
+	leaderboard.sort_custom(func(a, b): return a["score"] > b["score"])
+	leaderboard.resize(mini(leaderboard.size(), MAX_ENTRIES))
+	_save_leaderboard()
+	name_entry.visible = false
+	name_entry.release_focus()
+	_show_results()
+	# The Enter key that submitted the name would also restart the game,
+	# so wait briefly before allowing restart.
+	await get_tree().create_timer(0.4).timeout
+	entering_name = false
+
+
+func _show_results() -> void:
+	label.text = "GAME OVER  Score: %d  (Enter to restart)" % score
+	leaderboard_label.text = _leaderboard_text()
+	leaderboard_label.visible = true
+
+
+func _leaderboard_text() -> String:
+	var lines: Array[String] = ["HIGH SCORES"]
+	for i in leaderboard.size():
+		var e: Dictionary = leaderboard[i]
+		lines.append("%d. %s   %d" % [i + 1, e["name"], int(e["score"])])
+	return "\n".join(lines)
+
+
+func _load_leaderboard() -> void:
+	if not FileAccess.file_exists(SAVE_PATH):
+		return
+	var f := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var data = JSON.parse_string(f.get_as_text())
+	if data is Array:
+		leaderboard = data
+		if not leaderboard.is_empty():
+			high_score = int(leaderboard[0]["score"])
+
+
+func _save_leaderboard() -> void:
+	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	f.store_string(JSON.stringify(leaderboard))

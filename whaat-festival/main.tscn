@@ -66,6 +66,21 @@ offset_top = -23.0
 offset_right = 40.0
 grow_vertical = 0
 
+[node name="ScoreLabel" type="Label" parent="HUD" unique_id=1468139673]
+unique_name_in_owner = true
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="Leaderboard" type="Label" parent="HUD" unique_id=126829388]
+unique_name_in_owner = true
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="EnterName" type="LineEdit" parent="HUD" unique_id=882445723]
+unique_name_in_owner = true
+offset_right = 68.5
+offset_bottom = 31.0
+
 [node name="SpawnTimer" type="Timer" parent="." unique_id=795384298]
 unique_name_in_owner = true
 wait_time = 5.0
