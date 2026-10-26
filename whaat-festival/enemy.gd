@@ -9,9 +9,9 @@ signal reached_bottom
 @export var bottom_y := 600.0
 @export var damaged_color := Color(1.0, 0.4, 0.4)
 
-@onready var hp := max_hp
+@onready var hp : float = max_hp
 @onready var visual: Sprite2D = $Body
-var currency_value := 1
+var currency_value := 10
 
 
 func _ready() -> void:
@@ -25,7 +25,7 @@ func _process(delta: float) -> void:
 		queue_free()
 
 
-func hit(damage: int) -> void:
+func hit(damage: float) -> void:
 	if hp <= 0:
 		return
 	hp -= damage

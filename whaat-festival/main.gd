@@ -20,8 +20,8 @@ extends Node2D
 # Currency / mini ships
 @export var coin_normal := 1
 @export var coin_heavy := 3
-@export var coin_cloaked := 10
-@export var ship_cost := 5
+@export var coin_cloaked := 5
+@export var ship_cost := 1
 @export var mini_ship_scene: PackedScene
 
 # EFFECT: oxygen
@@ -35,7 +35,6 @@ extends Node2D
 @onready var label: Label = %GameOver
 @onready var spawn_timer: Timer = %SpawnTimer
 @onready var cloaked_sound: AudioStreamPlayer2D = %CloakedSpawn
-@onready var hangar: Marker2D = %Hangar
 @onready var currency_label: Label = %CurrencyLabel
 @onready var hud: CanvasLayer = %HUD   # EFFECT: power failure
 @onready var lives := max_lives
@@ -50,6 +49,9 @@ var oxygen_tick_timer := 0.0
 var shield_active := false
 var power_active := false
 
+var hangar_disabled := false
+
+@export var ship_margin := 40.0   # keep ships away from the screen edges
 
 func _ready() -> void:
 	lives_bar.max_value = max_lives
@@ -85,6 +87,10 @@ func _process(delta: float) -> void:
 		shield_active = true
 	if Input.is_action_just_pressed("fix_shield"):
 		shield_active = false
+	if Input.is_action_just_pressed("hangar_failure"):
+		_set_hangar_failure(true)
+	if Input.is_action_just_pressed("fix_hangar"):
+		_set_hangar_failure(false)
 	_process_oxygen_leak(delta)
 
 
@@ -145,14 +151,20 @@ func _add_currency(amount: int) -> void:
 	currency += amount
 	currency_label.text = "Credits: %d" % currency
 
-
 func _launch_mini_ship() -> void:
+	if hangar_disabled or currency < ship_cost:
+		return
 	if currency < ship_cost:
 		return
 	_add_currency(-ship_cost)
+
+	var size := get_viewport_rect().size
 	var s := mini_ship_scene.instantiate()
 	add_child(s)
-	s.global_position = hangar.global_position
+	s.global_position = Vector2(
+		randf_range(ship_margin, size.x - ship_margin),
+		size.y - ship_margin
+	)
 
 
 func _lose_lives(amount: int) -> void:
@@ -168,7 +180,7 @@ func _end_game() -> void:
 	game_over = true
 	oxygen_active = false
 	shield_active = false
-	_set_power_failure(false)
+	hangar_disabled = false
 	spawn_timer.stop()
 	turret.process_mode = Node.PROCESS_MODE_DISABLED
 	for e in get_tree().get_nodes_in_group("enemies"):
@@ -202,3 +214,7 @@ func _process_oxygen_leak(delta: float) -> void:
 func _set_power_failure(on: bool) -> void:
 	power_active = on
 	hud.visible = not on
+
+func _set_hangar_failure(on: bool) -> void:
+	hangar_disabled = on
+	currency_label.modulate = Color(1.0, 0.9, 0.2) if on else Color.WHITE

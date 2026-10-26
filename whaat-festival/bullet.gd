@@ -2,7 +2,7 @@ class_name Bullet
 extends Area2D
 
 var velocity := Vector2.ZERO
-var damage := 1
+var damage := 1.0
 
 
 func _process(delta: float) -> void:

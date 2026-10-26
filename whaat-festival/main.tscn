@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cgcjpp1luc0t3" path="res://enemy.tscn" id="2_h2yge"]
 [ext_resource type="PackedScene" uid="uid://cgi012qqxplg3" path="res://slow_enemy.tscn" id="3_lquwl"]
 [ext_resource type="PackedScene" uid="uid://18cpu6nxqdsn" path="res://hidden_enemy.tscn" id="4_7mycd"]
+[ext_resource type="PackedScene" uid="uid://cjv8xoatkenqc" path="res://mini_ship.tscn" id="5_272bh"]
 [ext_resource type="AudioStream" uid="uid://dwrw148gtdimt" path="res://cloakedSound.mp3" id="6_7mycd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7mycd"]
@@ -18,6 +19,7 @@ script = ExtResource("1_ig7tw")
 enemy_scene = ExtResource("2_h2yge")
 heavy_scene = ExtResource("3_lquwl")
 cloaked_scene = ExtResource("4_7mycd")
+mini_ship_scene = ExtResource("5_272bh")
 
 [node name="Turret" parent="." unique_id=689885630 instance=ExtResource("2_0xm2m")]
 unique_name_in_owner = true
@@ -52,6 +54,15 @@ offset_bottom = 27.0
 grow_horizontal = 0
 theme_override_styles/background = SubResource("StyleBoxFlat_7mycd")
 theme_override_styles/fill = SubResource("StyleBoxFlat_272bh")
+
+[node name="CurrencyLabel" type="Label" parent="HUD" unique_id=1171820860]
+unique_name_in_owner = true
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_right = 40.0
+grow_vertical = 0
 
 [node name="SpawnTimer" type="Timer" parent="." unique_id=795384298]
 unique_name_in_owner = true
