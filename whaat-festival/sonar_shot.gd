@@ -1,7 +1,7 @@
 class_name SonarShot
 extends Area2D
 
-@export var lifetime := 2.0
+@export var lifetime := 3.5
 @export var pierce := true  # keep flying and reveal everything along the path
 
 var velocity := Vector2.ZERO

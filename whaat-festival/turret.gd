@@ -17,7 +17,7 @@ signal status_changed(text: String)
 @export var hold_to_fire := true
 
 @export var sonar_scene: PackedScene
-@export var sonar_speed := 500.0
+@export var sonar_speed := 225.0
 @export var sonar_max_charges := 3
 @export var sonar_full_recharge_time := 20.0
 var sonar_charges := 0
@@ -34,6 +34,8 @@ var ammo_types: Array[Dictionary] = [
 	{"name": "Heavy", "damage": 3, "shield_damage": 3.0, "mag": 6, "fire_rate": 2.0,
 	 "reload": 2.0, "speed": 450.0, "color": Color(1.0, 0.4, 0.2)},
 ]
+@onready var shoot_sounds: Array[AudioStreamPlayer2D] = [%Standard, %Heavy]
+@onready var sonar_sound: AudioStreamPlayer2D = %Sonar
 
 var udp := PacketPeerUDP.new()
 var cooldown := 0.0
@@ -178,6 +180,7 @@ func _shoot() -> void:
 	if overheated:
 		rate *= overheat_fire_mult
 	cooldown = 1.0 / rate
+	shoot_sounds[current].play()
 
 	var b := bullet_scene.instantiate() as Bullet
 	b.velocity = Vector2.UP.rotated(global_rotation) * ammo["speed"]
@@ -218,6 +221,7 @@ func _update_sonar(delta: float) -> void:
 
 func _fire_sonar() -> void:
 	sonar_charges -= 1
+	sonar_sound.play()
 
 	var s := sonar_scene.instantiate()
 	s.velocity = Vector2.UP.rotated(global_rotation) * sonar_speed

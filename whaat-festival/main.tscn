@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://18cpu6nxqdsn" path="res://hidden_enemy.tscn" id="4_7mycd"]
 [ext_resource type="PackedScene" uid="uid://cjv8xoatkenqc" path="res://mini_ship.tscn" id="5_272bh"]
 [ext_resource type="PackedScene" uid="uid://bwlgqxi2khyct" path="res://heal_ship.tscn" id="6_5vw27"]
-[ext_resource type="AudioStream" uid="uid://dwrw148gtdimt" path="res://cloakedSound.mp3" id="6_7mycd"]
+[ext_resource type="AudioStream" uid="uid://dq8yq7gdgfrnu" path="res://CloakedSpawn.wav" id="8_5vw27"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7mycd"]
 bg_color = Color(1, 0, 0.14117648, 1)
@@ -105,7 +105,7 @@ autostart = true
 
 [node name="CloakedSpawn" type="AudioStreamPlayer2D" parent="." unique_id=336997994]
 unique_name_in_owner = true
-stream = ExtResource("6_7mycd")
+stream = ExtResource("8_5vw27")
 
 [connection signal="status_changed" from="Turret" to="HUD/AmmoLabel" method="set_text"]
 [connection signal="timeout" from="SpawnTimer" to="." method="_on_spawn_timer_timeout"]

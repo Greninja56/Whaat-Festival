@@ -20,7 +20,6 @@ var max_shield := 0.0
 @onready var visual: Sprite2D = $Body
 var currency_value := 10
 
-
 func _ready() -> void:
 	_update_color()
 

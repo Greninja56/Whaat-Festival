@@ -4,6 +4,7 @@ extends Enemy
 @export var cloaked_alpha := 0.0
 @export var reveal_fade_time := 0.3
 
+@onready var reveal_sound: AudioStreamPlayer2D = %Reveal
 var revealed := false
 
 
@@ -17,6 +18,7 @@ func reveal() -> void:
 	if revealed:
 		return
 	revealed = true
+	reveal_sound.play()
 	var tween := create_tween()
 	tween.tween_property(visual, "self_modulate:a", 1.0, reveal_fade_time)
 
