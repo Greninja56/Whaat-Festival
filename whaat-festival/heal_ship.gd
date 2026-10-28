@@ -22,7 +22,7 @@ func _process(delta: float) -> void:
 		queue_free()
 
 
-func hit(damage: float) -> void:
+func hit(damage: float, _shield_damage: float = 0.0) -> void:
 	if hp <= 0.0:
 		return
 	hp -= damage

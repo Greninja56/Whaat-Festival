@@ -75,6 +75,12 @@ var high_score := 0
 var leaderboard: Array = []
 var entering_name := false
 
+@export var shield_start_time := 180.0     # seconds before shields appear
+@export var shield_ramp_time := 300.0      # seconds to reach max chance
+@export_range(0.0, 1.0) var shield_chance_start := 0.15
+@export_range(0.0, 1.0) var shield_chance_max := 0.6
+@export var shield_hp := 3.0
+
 func _ready() -> void:
 	lives_bar.max_value = max_lives
 	lives_bar.value = lives
@@ -173,6 +179,10 @@ func _spawn_enemy() -> void:
 	e.bottom_y = turret.position.y
 	e.reached_bottom.connect(_on_enemy_reached_bottom)
 	e.died.connect(_on_enemy_died.bind(points))
+	if scene != cloaked_scene and elapsed >= shield_start_time:
+		var t := clampf((elapsed - shield_start_time) / shield_ramp_time, 0.0, 1.0)
+		if randf() < lerpf(shield_chance_start, shield_chance_max, t):
+			e.set_shield(shield_hp)
 	add_child(e)
 
 	if scene == cloaked_scene:

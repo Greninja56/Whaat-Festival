@@ -9,6 +9,7 @@
 position = Vector2(0, 8)
 scale = Vector2(0.3, 0.3)
 script = ExtResource("1_nti3q")
+heal_amount = 5
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1400828423]
 texture = ExtResource("2_vuvdk")
