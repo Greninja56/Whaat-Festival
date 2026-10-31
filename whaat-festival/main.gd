@@ -11,6 +11,13 @@ extends Node2D
 @export var cloaked_speed_mult := 0.5
 @export var cloaked_hp_mult := 1
 
+@export var shake_max_offset := 14.0   # pixels at full trauma
+@export var shake_decay := 2.5         # trauma lost per second
+
+@onready var camera: Camera2D = %ScreenShake
+
+var shake_trauma := 0.0
+
 @export var max_lives := 50
 @export var enemy_damage := 2
 @export var spawn_start := 10.0
@@ -46,6 +53,7 @@ extends Node2D
 @onready var hurt_sound: AudioStreamPlayer2D = %Hurt
 @onready var fix_sound: AudioStreamPlayer2D = %Fixed
 @onready var currency_label: Label = %CurrencyLabel
+@onready var music: AudioStreamPlayer2D = %Music
 @onready var hud: CanvasLayer = %HUD   # EFFECT: power failure
 @onready var lives := max_lives
 
@@ -91,6 +99,20 @@ var entering_name := false
 @export_range(0.0, 1.0) var shield_chance_max := 0.6
 @export var shield_hp := 3.0
 
+@export var tint_cycle_time := 1.2     # seconds per color when several problems are active
+@export var tint_max_alpha := 0.3
+@export var tint_edge_min := 0.015   # thinnest point of the pulse
+@export var tint_edge_max := 0.025    # widest point of the pulse
+@export var tint_pulse := true
+
+@onready var edge_tint: ColorRect = %EdgeTint
+
+var tint_mat: ShaderMaterial
+var tint_index := 0
+var tint_timer := 0.0
+var tint_strength := 0.0
+var tint_color := Color.WHITE
+
 func _ready() -> void:
 	lives_bar.max_value = max_lives
 	lives_bar.value = lives
@@ -103,9 +125,12 @@ func _ready() -> void:
 	name_entry.text_submitted.connect(_on_name_submitted)
 	leaderboard_label.visible = false
 	_add_score(0)
+	tint_mat = edge_tint.material as ShaderMaterial
+	tint_mat.set_shader_parameter("strength", 0.0)
 
 
 func _process(delta: float) -> void:
+	_update_shake(delta)
 	if game_over:
 		if not entering_name and Input.is_action_just_pressed("ui_accept"):
 			get_tree().reload_current_scene()
@@ -157,8 +182,57 @@ func _process(delta: float) -> void:
 		_add_score(score_fix)
 		fix_sound.play()
 	_process_oxygen_leak(delta)
+	_update_edge_tint(delta)
+
+func _active_problem_colors() -> Array[Color]:
+	var c: Array[Color] = []
+	if turret.overheated:
+		c.append(Color(1.0, 0.2, 0.2))    # gun overheating: red
+	if power_active:
+		c.append(Color(0.45, 0.7, 1.0))  # power failure: blue
+	if oxygen_active:
+		c.append(Color(0.2, 1.0, 0.35))   # oxygen leak: green
+	if hangar_disabled:
+		c.append(Color(1.0, 0.9, 0.2))    # hangar offline: yellow
+	if shield_active:
+		c.append(Color.WHITE)             # shield failure: white
+	return c
 
 
+func _update_edge_tint(delta: float) -> void:
+	var colors := _active_problem_colors()
+	var target := 0.0
+
+	if colors.size() > 0:
+		target = tint_max_alpha
+		tint_index = tint_index % colors.size()
+
+		# Several problems: step to the next color on a timer
+		if colors.size() > 1:
+			tint_timer -= delta
+			if tint_timer <= 0.0:
+				tint_timer = tint_cycle_time
+				tint_index = (tint_index + 1) % colors.size()
+
+		if tint_strength < 0.01:
+			tint_color = colors[tint_index]   # fading in from nothing: no color slide
+		else:
+			tint_color = tint_color.lerp(colors[tint_index], 1.0 - exp(-8.0 * delta))
+	else:
+		tint_index = 0
+		tint_timer = 0.0
+
+	tint_strength = move_toward(tint_strength, target, delta * 2.0)
+
+	var edge := tint_edge_max
+	if tint_pulse:
+		var wave := 0.5 + 0.5 * sin(elapsed * 6.0)   # 0..1
+		edge = lerpf(tint_edge_min, tint_edge_max, wave)
+
+	tint_mat.set_shader_parameter("tint", tint_color)
+	tint_mat.set_shader_parameter("strength", tint_strength)
+	tint_mat.set_shader_parameter("edge_size", edge)
+	
 func _on_spawn_timer_timeout() -> void:
 	_spawn_enemy()
 	spawn_timer.start(maxf(spawn_min, spawn_start - elapsed * spawn_ramp))
@@ -245,6 +319,7 @@ func _lose_lives(amount: int) -> void:
 	if game_over:
 		return
 	lives = maxi(lives - amount, 0)
+	_shake(0.3 + 0.15 * amount)
 	hurt_sound.play()
 	if lives == 0:
 		_end_game()
@@ -257,8 +332,10 @@ func _end_game() -> void:
 	oxygen_active = false
 	shield_active = false
 	hangar_disabled = false
+	music.stop()
 	game_over_sound.play()
 	spawn_timer.stop()
+	edge_tint.visible = false
 	turret.process_mode = Node.PROCESS_MODE_DISABLED
 	for e in get_tree().get_nodes_in_group("enemies"):
 		e.queue_free()
@@ -377,3 +454,12 @@ func _load_leaderboard() -> void:
 func _save_leaderboard() -> void:
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	f.store_string(JSON.stringify(leaderboard))
+	
+func _shake(amount: float) -> void:
+	shake_trauma = minf(shake_trauma + amount, 1.0)
+
+
+func _update_shake(delta: float) -> void:
+	shake_trauma = maxf(shake_trauma - shake_decay * delta, 0.0)
+	var power := shake_trauma * shake_trauma   # squared, so small hits are subtle
+	camera.offset = Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * shake_max_offset * power
