@@ -8,6 +8,8 @@ extends Node2D
 @export var damage := 0.5
 @export var aim_at_enemies := true  # false = always shoot straight up
 
+@onready var shoot_sound: AudioStreamPlayer2D = $Shoot
+
 var age := 0.0
 var cooldown := 0.0
 
@@ -25,6 +27,8 @@ func _process(delta: float) -> void:
 
 
 func _shoot() -> void:
+	shoot_sound.pitch_scale = randf_range(0.95, 1.15)
+	shoot_sound.play()
 	var dir := Vector2.UP
 	if aim_at_enemies:
 		var target := _find_target()

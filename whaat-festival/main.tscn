@@ -16,6 +16,8 @@
 [ext_resource type="AudioStream" uid="uid://brpx3d01d6gct" path="res://HangarClosed.wav" id="14_w48qg"]
 [ext_resource type="AudioStream" uid="uid://dxg1g0bl5qqt3" path="res://GameOver.wav" id="15_vivmo"]
 [ext_resource type="AudioStream" uid="uid://b7ltr1m6rntyd" path="res://Heal.wav" id="16_2cqfq"]
+[ext_resource type="AudioStream" uid="uid://b0wk1lmf6it2n" path="res://PlayerDamage.mp3" id="17_yaehf"]
+[ext_resource type="AudioStream" uid="uid://i6t51dtbggn0" path="res://Fixed.wav" id="18_074og"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7mycd"]
 bg_color = Color(1, 0, 0.14117648, 1)
@@ -151,6 +153,16 @@ stream = ExtResource("15_vivmo")
 [node name="Heal" type="AudioStreamPlayer2D" parent="." unique_id=1526907786]
 unique_name_in_owner = true
 stream = ExtResource("16_2cqfq")
+
+[node name="Hurt" type="AudioStreamPlayer2D" parent="." unique_id=669023525]
+unique_name_in_owner = true
+stream = ExtResource("17_yaehf")
+volume_db = 3.888
+max_polyphony = 10
+
+[node name="Fixed" type="AudioStreamPlayer2D" parent="." unique_id=2032821974]
+unique_name_in_owner = true
+stream = ExtResource("18_074og")
 
 [connection signal="status_changed" from="Turret" to="HUD/AmmoLabel" method="set_text"]
 [connection signal="timeout" from="SpawnTimer" to="." method="_on_spawn_timer_timeout"]

@@ -43,6 +43,8 @@ extends Node2D
 @onready var hangar_sound: AudioStreamPlayer2D = %HangarDown
 @onready var game_over_sound: AudioStreamPlayer2D = %GameOverSound
 @onready var heal_sound: AudioStreamPlayer2D = %Heal
+@onready var hurt_sound: AudioStreamPlayer2D = %Hurt
+@onready var fix_sound: AudioStreamPlayer2D = %Fixed
 @onready var currency_label: Label = %CurrencyLabel
 @onready var hud: CanvasLayer = %HUD   # EFFECT: power failure
 @onready var lives := max_lives
@@ -54,7 +56,7 @@ var heal_timer := 0.0
 
 var elapsed := 0.0
 var game_over := false
-var currency := 0
+var currency := 100
 
 # EFFECT state
 var oxygen_active := false
@@ -123,6 +125,7 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("fix_oxygen") and oxygen_active:
 		oxygen_active = false
 		oxygen_sound.stop()
+		fix_sound.play()
 		_add_score(score_fix)
 	if Input.is_action_just_pressed("overheat"):
 		turret.set_overheated(true)
@@ -130,6 +133,7 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("fix_overheat") and turret.overheated:
 		turret.set_overheated(false)
 		overheat_sound.stop()
+		fix_sound.play()
 		_add_score(score_fix)
 	if Input.is_action_just_pressed("power_failure"):
 		_set_power_failure(true)
@@ -137,18 +141,21 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("fix_power") and power_active:
 		_set_power_failure(false)
 		_add_score(score_fix)
+		fix_sound.play()
 	if Input.is_action_just_pressed("shield_failure"):
 		shield_active = true
 		shield_sound.play()
 	if Input.is_action_just_pressed("fix_shield") and shield_active:
 		shield_active = false
 		_add_score(score_fix)
+		fix_sound.play()
 	if Input.is_action_just_pressed("hangar_failure"):
 		_set_hangar_failure(true)
 		hangar_sound.play()
 	if Input.is_action_just_pressed("fix_hangar") and hangar_disabled:
 		_set_hangar_failure(false)
 		_add_score(score_fix)
+		fix_sound.play()
 	_process_oxygen_leak(delta)
 
 
@@ -238,6 +245,7 @@ func _lose_lives(amount: int) -> void:
 	if game_over:
 		return
 	lives = maxi(lives - amount, 0)
+	hurt_sound.play()
 	if lives == 0:
 		_end_game()
 	_update_label()

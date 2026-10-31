@@ -8,6 +8,8 @@
 [ext_resource type="AudioStream" uid="uid://c1he1qm78bgjq" path="res://HeavyBullet.wav" id="6_vt3mo"]
 [ext_resource type="AudioStream" uid="uid://botm6chowbsyg" path="res://SonarShot.ogg" id="7_vt3mo"]
 [ext_resource type="AudioStream" uid="uid://d0w3jhec0f3oo" path="res://EmptyGun.wav" id="8_rcf7x"]
+[ext_resource type="AudioStream" uid="uid://b81twqau5u1al" path="res://Reload.wav" id="9_n42ok"]
+[ext_resource type="AudioStream" uid="uid://dhnwu1oem5qab" path="res://SwitchAmmo.wav" id="10_60y6o"]
 
 [node name="Turret" type="Node2D" unique_id=689885630]
 position = Vector2(576, 608)
@@ -42,3 +44,13 @@ max_polyphony = 3
 unique_name_in_owner = true
 stream = ExtResource("8_rcf7x")
 max_polyphony = 10
+
+[node name="Reloading" type="AudioStreamPlayer2D" parent="." unique_id=1483405512]
+unique_name_in_owner = true
+stream = ExtResource("9_n42ok")
+volume_db = 5.346
+
+[node name="Switch" type="AudioStreamPlayer2D" parent="." unique_id=2128744226]
+unique_name_in_owner = true
+stream = ExtResource("10_60y6o")
+volume_db = 22.355

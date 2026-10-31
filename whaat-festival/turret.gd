@@ -37,6 +37,8 @@ var ammo_types: Array[Dictionary] = [
 @onready var shoot_sounds: Array[AudioStreamPlayer2D] = [%Standard, %Heavy]
 @onready var sonar_sound: AudioStreamPlayer2D = %Sonar
 @onready var empty_gun: AudioStreamPlayer2D = %Empty
+@onready var reload_sound: AudioStreamPlayer2D = %Reloading
+@onready var switch_sound: AudioStreamPlayer2D = %Switch
 
 var udp := PacketPeerUDP.new()
 var cooldown := 0.0
@@ -106,6 +108,7 @@ func _update_reload(delta: float) -> void:
 	reload_left -= delta
 	if reload_left <= 0.0:
 		reload_left = 0.0
+		reload_sound.stop()
 		mags[current] = ammo_types[current]["mag"]
 		status_changed.emit(status_text())
 
@@ -165,6 +168,8 @@ func _switch_to(index: int) -> void:
 		return
 	current = index
 	reload_left = 0.0
+	reload_sound.stop()
+	switch_sound.play()
 	cooldown = 0.15
 	status_changed.emit(status_text())
 
@@ -173,6 +178,8 @@ func _start_reload() -> void:
 	if reload_left > 0.0 or mags[current] >= ammo_types[current]["mag"]:
 		return
 	reload_left = ammo_types[current]["reload"]
+	reload_sound.pitch_scale = reload_sound.stream.get_length() / reload_left
+	reload_sound.play()
 	status_changed.emit(status_text())
 
 
