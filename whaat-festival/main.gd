@@ -4,7 +4,7 @@ extends Node2D
 @export var heavy_scene: PackedScene
 @export var cloaked_scene: PackedScene
 @export_range(0.0, 1.0) var heavy_chance := 0.3
-@export_range(0.0, 1.0) var cloaked_chance := 0.9
+@export_range(0.0, 1.0) var cloaked_chance := 0.1
 @export var base_hp := 3
 @export var heavy_speed_mult := 0.25
 @export var heavy_hp_mult := 5
@@ -21,7 +21,7 @@ extends Node2D
 @export var coin_normal := 1
 @export var coin_heavy := 3
 @export var coin_cloaked := 5
-@export var ship_cost := 1
+@export var ship_cost := 5
 @export var mini_ship_scene: PackedScene
 
 # EFFECT: oxygen
@@ -35,6 +35,12 @@ extends Node2D
 @onready var label: Label = %GameOver
 @onready var spawn_timer: Timer = %SpawnTimer
 @onready var cloaked_sound: AudioStreamPlayer2D = %CloakedSpawn
+@onready var die_sound: AudioStreamPlayer2D = %EnemyDies
+@onready var oxygen_sound: AudioStreamPlayer2D = %OxygenAlarm
+@onready var overheat_sound: AudioStreamPlayer2D = %OverheatAlarm
+@onready var power_sound: AudioStreamPlayer2D = %PowerDown
+@onready var shield_sound: AudioStreamPlayer2D = %ShieldDown
+@onready var hangar_sound: AudioStreamPlayer2D = %HangarDown
 @onready var currency_label: Label = %CurrencyLabel
 @onready var hud: CanvasLayer = %HUD   # EFFECT: power failure
 @onready var lives := max_lives
@@ -114,24 +120,30 @@ func _process(delta: float) -> void:
 		_start_oxygen_leak()
 	if Input.is_action_just_pressed("fix_oxygen") and oxygen_active:
 		oxygen_active = false
+		oxygen_sound.stop()
 		_add_score(score_fix)
 	if Input.is_action_just_pressed("overheat"):
 		turret.set_overheated(true)
+		overheat_sound.play()
 	if Input.is_action_just_pressed("fix_overheat") and turret.overheated:
 		turret.set_overheated(false)
+		overheat_sound.stop()
 		_add_score(score_fix)
 	if Input.is_action_just_pressed("power_failure"):
 		_set_power_failure(true)
+		power_sound.play()
 	if Input.is_action_just_pressed("fix_power") and power_active:
 		_set_power_failure(false)
 		_add_score(score_fix)
 	if Input.is_action_just_pressed("shield_failure"):
 		shield_active = true
+		shield_sound.play()
 	if Input.is_action_just_pressed("fix_shield") and shield_active:
 		shield_active = false
 		_add_score(score_fix)
 	if Input.is_action_just_pressed("hangar_failure"):
 		_set_hangar_failure(true)
+		hangar_sound.play()
 	if Input.is_action_just_pressed("fix_hangar") and hangar_disabled:
 		_set_hangar_failure(false)
 		_add_score(score_fix)
@@ -197,6 +209,7 @@ func _on_enemy_reached_bottom() -> void:
 func _on_enemy_died(value: int, points: int) -> void:
 	_add_currency(value)
 	_add_score(points)
+	die_sound.play()
 
 
 func _add_currency(amount: int) -> void:
@@ -230,6 +243,7 @@ func _lose_lives(amount: int) -> void:
 
 func _end_game() -> void:
 	game_over = true
+	oxygen_sound.stop()
 	oxygen_active = false
 	shield_active = false
 	hangar_disabled = false
@@ -261,6 +275,7 @@ func _start_oxygen_leak() -> void:
 		return
 	oxygen_active = true
 	oxygen_tick_timer = oxygen_tick
+	oxygen_sound.play()
 
 
 func _process_oxygen_leak(delta: float) -> void:

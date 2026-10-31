@@ -35,3 +35,4 @@ stream = ExtResource("6_vt3mo")
 [node name="Sonar" type="AudioStreamPlayer2D" parent="." unique_id=1899060480]
 unique_name_in_owner = true
 stream = ExtResource("7_vt3mo")
+max_polyphony = 3
