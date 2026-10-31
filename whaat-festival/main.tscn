@@ -203,5 +203,9 @@ mouse_filter = 2
 unique_name_in_owner = true
 anchor_mode = 0
 
+[node name="Hangar" type="Marker2D" parent="." unique_id=566862702]
+unique_name_in_owner = true
+position = Vector2(127, 520)
+
 [connection signal="status_changed" from="Turret" to="HUD/AmmoLabel" method="set_text"]
 [connection signal="timeout" from="SpawnTimer" to="." method="_on_spawn_timer_timeout"]

@@ -13,7 +13,7 @@ extends Node2D
 
 @export var shake_max_offset := 14.0   # pixels at full trauma
 @export var shake_decay := 2.5         # trauma lost per second
-
+@onready var hangar: Marker2D = %Hangar
 @onready var camera: Camera2D = %ScreenShake
 
 var shake_trauma := 0.0
@@ -302,18 +302,16 @@ func _add_currency(amount: int) -> void:
 func _launch_mini_ship() -> void:
 	if hangar_disabled or currency < ship_cost:
 		return
-	if currency < ship_cost:
-		return
 	_add_currency(-ship_cost)
 
 	var size := get_viewport_rect().size
-	var s := mini_ship_scene.instantiate()
-	add_child(s)
-	s.global_position = Vector2(
+	var station := Vector2(
 		randf_range(ship_margin, size.x - ship_margin),
 		size.y - ship_margin
 	)
-
+	var s := mini_ship_scene.instantiate() as MiniShip
+	add_child(s)
+	s.setup(hangar.global_position, station)
 
 func _lose_lives(amount: int) -> void:
 	if game_over:
