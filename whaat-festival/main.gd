@@ -41,6 +41,8 @@ extends Node2D
 @onready var power_sound: AudioStreamPlayer2D = %PowerDown
 @onready var shield_sound: AudioStreamPlayer2D = %ShieldDown
 @onready var hangar_sound: AudioStreamPlayer2D = %HangarDown
+@onready var game_over_sound: AudioStreamPlayer2D = %GameOverSound
+@onready var heal_sound: AudioStreamPlayer2D = %Heal
 @onready var currency_label: Label = %CurrencyLabel
 @onready var hud: CanvasLayer = %HUD   # EFFECT: power failure
 @onready var lives := max_lives
@@ -247,6 +249,7 @@ func _end_game() -> void:
 	oxygen_active = false
 	shield_active = false
 	hangar_disabled = false
+	game_over_sound.play()
 	spawn_timer.stop()
 	turret.process_mode = Node.PROCESS_MODE_DISABLED
 	for e in get_tree().get_nodes_in_group("enemies"):
@@ -308,6 +311,7 @@ func _on_heal_collected(amount: int) -> void:
 	if game_over:
 		return
 	lives = mini(lives + amount, max_lives)
+	heal_sound.play()
 	_update_label()
 	
 func _add_score(amount: int) -> void:

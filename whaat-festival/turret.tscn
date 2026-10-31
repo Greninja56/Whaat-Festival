@@ -7,6 +7,7 @@
 [ext_resource type="AudioStream" uid="uid://b05uhfi3bvuom" path="res://StandardBullet.wav" id="5_mhatg"]
 [ext_resource type="AudioStream" uid="uid://c1he1qm78bgjq" path="res://HeavyBullet.wav" id="6_vt3mo"]
 [ext_resource type="AudioStream" uid="uid://botm6chowbsyg" path="res://SonarShot.ogg" id="7_vt3mo"]
+[ext_resource type="AudioStream" uid="uid://d0w3jhec0f3oo" path="res://EmptyGun.wav" id="8_rcf7x"]
 
 [node name="Turret" type="Node2D" unique_id=689885630]
 position = Vector2(576, 608)
@@ -36,3 +37,8 @@ stream = ExtResource("6_vt3mo")
 unique_name_in_owner = true
 stream = ExtResource("7_vt3mo")
 max_polyphony = 3
+
+[node name="Empty" type="AudioStreamPlayer2D" parent="." unique_id=698072878]
+unique_name_in_owner = true
+stream = ExtResource("8_rcf7x")
+max_polyphony = 10

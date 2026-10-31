@@ -36,6 +36,7 @@ var ammo_types: Array[Dictionary] = [
 ]
 @onready var shoot_sounds: Array[AudioStreamPlayer2D] = [%Standard, %Heavy]
 @onready var sonar_sound: AudioStreamPlayer2D = %Sonar
+@onready var empty_gun: AudioStreamPlayer2D = %Empty
 
 var udp := PacketPeerUDP.new()
 var cooldown := 0.0
@@ -69,8 +70,11 @@ func _process(delta: float) -> void:
 	_update_sonar(delta)
 
 	cooldown = maxf(cooldown - delta, 0.0)
-	if hold_to_fire and Input.is_action_pressed("fire") and _can_shoot():
-		_shoot()
+	if hold_to_fire and Input.is_action_pressed("fire"):
+		if _can_shoot():
+			_shoot()
+		else:
+			_try_empty_click()
 
 
 func _read_packets() -> void:
@@ -134,8 +138,11 @@ func _handle(s: Dictionary) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not hold_to_fire and event.is_action_pressed("fire") and _can_shoot():
-		_shoot()
+	if not hold_to_fire and event.is_action_pressed("fire"):
+		if _can_shoot():
+			_shoot()
+		else:
+			_try_empty_click()
 	elif event.is_action_pressed("center"):
 		center_yaw = raw_yaw
 		target_angle = 0.0
@@ -236,3 +243,9 @@ func set_overheated(value: bool) -> void:
 	overheated = value
 	modulate = Color(1.0, 0.3, 0.3) if value else Color.WHITE
 	status_changed.emit(status_text())
+	
+func _try_empty_click() -> void:
+	if mags[current] > 0 or reload_left > 0.0 or cooldown > 0.0:
+		return
+	empty_gun.play()
+	cooldown = 0.3   # stops the click repeating every frame while held
