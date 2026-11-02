@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dkuen6ka14280"
-path="res://.godot/imported/bob_builder.jpeg-8d45a1468bc82a08449f1b8e6013ce93.ctex"
+uid="uid://mwtnkmek3ec5"
+path="res://.godot/imported/slow_enemy.png-ca559415279f15c3cba9fbd0a4e8cb46.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://bob_builder.jpeg"
-dest_files=["res://.godot/imported/bob_builder.jpeg-8d45a1468bc82a08449f1b8e6013ce93.ctex"]
+source_file="res://slow_enemy.png"
+dest_files=["res://.godot/imported/slow_enemy.png-ca559415279f15c3cba9fbd0a4e8cb46.ctex"]
 
 [params]
 

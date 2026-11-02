@@ -3,8 +3,8 @@ extends Node2D
 @export var enemy_scene: PackedScene
 @export var heavy_scene: PackedScene
 @export var cloaked_scene: PackedScene
-@export_range(0.0, 1.0) var heavy_chance := 0.3
-@export_range(0.0, 1.0) var cloaked_chance := 0.9
+@export_range(0.0, 1.0) var heavy_chance := 0.9
+@export_range(0.0, 1.0) var cloaked_chance := 0.1
 @export var base_hp := 3
 @export var heavy_speed_mult := 0.25
 @export var heavy_hp_mult := 5
