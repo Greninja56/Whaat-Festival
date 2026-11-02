@@ -30,9 +30,9 @@ var overheated := false
 
 var ammo_types: Array[Dictionary] = [
 	{"name": "Standard", "damage": 1, "shield_damage": 0.1, "mag": 30, "fire_rate": 8.0,
-	 "reload": 1.2, "speed": 600.0, "color": Color(1.0, 0.9, 0.3)},
+	 "reload": 1.2, "speed": 600.0, "color": Color(1.0, 0.9, 0.3), "scale": 1.0},
 	{"name": "Heavy", "damage": 3, "shield_damage": 3.0, "mag": 6, "fire_rate": 2.0,
-	 "reload": 2.0, "speed": 450.0, "color": Color(1.0, 0.4, 0.2)},
+	 "reload": 2.0, "speed": 450.0, "color": Color(1.0, 0.4, 0.2), "scale": 1.5},
 ]
 @onready var shoot_sounds: Array[AudioStreamPlayer2D] = [%Standard, %Heavy]
 @onready var sonar_sound: AudioStreamPlayer2D = %Sonar
@@ -201,10 +201,12 @@ func _shoot() -> void:
 	b.damage = ammo["damage"]
 	b.shield_damage = ammo["shield_damage"]
 	b.modulate = ammo["color"]
+	b.scale = Vector2.ONE * ammo["scale"]
 
 	var parent := bullet_parent if bullet_parent else get_tree().current_scene
 	parent.add_child(b)
 	b.global_position = gun.global_position
+	b.global_rotation = gun.global_rotation
 
 	status_changed.emit(status_text())
 
@@ -243,6 +245,7 @@ func _fire_sonar() -> void:
 	var parent := bullet_parent if bullet_parent else get_tree().current_scene
 	parent.add_child(s)
 	s.global_position = gun.global_position
+	s.global_rotation = global_rotation
 
 	status_changed.emit(status_text())
 	

@@ -21,6 +21,7 @@ var station := Vector2.ZERO   # where it hovers and shoots
 
 @onready var muzzle: Marker2D = %Muzzle
 @onready var shoot_sound: AudioStreamPlayer2D = $Shoot
+var aim_dir := Vector2.UP   # last direction aimed; reused when there's no target
 
 var age := 0.0
 var cooldown := 0.0
@@ -58,18 +59,21 @@ func _fly_to(target: Vector2, delta: float) -> bool:
 func _shoot() -> void:
 	shoot_sound.pitch_scale = randf_range(0.95, 1.15)
 	shoot_sound.play()
-	var dir := Vector2.UP
+
 	if aim_at_enemies:
 		var target := _find_target()
 		if target:
-			dir = _lead_direction(target)
-			rotation = dir.angle() + PI / 2.0
+			aim_dir = _lead_direction(target)
+
+	rotation = aim_dir.angle() + PI / 2.0   # always face the aim direction
 	_flash()
+
 	var b := bullet_scene.instantiate() as Bullet
-	b.velocity = dir * bullet_speed
+	b.velocity = aim_dir * bullet_speed
 	b.damage = damage
 	get_tree().current_scene.add_child(b)
 	b.global_position = muzzle.global_position
+	b.global_rotation = muzzle.global_rotation
 
 
 func _lead_direction(target: Enemy) -> Vector2:

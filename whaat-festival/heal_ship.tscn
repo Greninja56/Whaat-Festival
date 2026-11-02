@@ -1,10 +1,11 @@
 [gd_scene format=3 uid="uid://bwlgqxi2khyct"]
 
 [ext_resource type="Script" uid="uid://dpvve3l3mp6gd" path="res://heal_ship.gd" id="1_nti3q"]
-[ext_resource type="Texture2D" uid="uid://bwnpdlh1ld8ah" path="res://images.png" id="2_vuvdk"]
+[ext_resource type="Texture2D" uid="uid://ddreheq710oom" path="res://heal_ship.png" id="2_vuvdk"]
 [ext_resource type="AudioStream" uid="uid://d02u5kbsqnmxr" path="res://HealShipSpawn.wav" id="3_vuvdk"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_vpvrv"]
+radius = 5.0
 
 [node name="HealShip" type="Area2D" unique_id=1687234795]
 position = Vector2(0, 8)
@@ -13,6 +14,8 @@ script = ExtResource("1_nti3q")
 heal_amount = 5
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1400828423]
+position = Vector2(10, 6.666666)
+scale = Vector2(1.5, 1.2)
 texture = ExtResource("2_vuvdk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1311422476]
