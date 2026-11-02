@@ -44,14 +44,15 @@ heal_ship_scene = ExtResource("6_5vw27")
 
 [node name="Background" type="TextureRect" parent="." unique_id=218473524]
 unique_name_in_owner = true
-offset_right = 1156.0
-offset_bottom = 653.0
+offset_right = 1153.0
+offset_bottom = 766.0
 texture = ExtResource("7_cegan")
 expand_mode = 1
 stretch_mode = 6
 
 [node name="Turret" parent="." unique_id=689885630 instance=ExtResource("2_0xm2m")]
 unique_name_in_owner = true
+position = Vector2(576, 687)
 
 [node name="Bullets" type="Node2D" parent="." unique_id=1277818847]
 
@@ -184,7 +185,7 @@ stream = ExtResource("18_074og")
 [node name="Music" type="AudioStreamPlayer2D" parent="." unique_id=290627072]
 unique_name_in_owner = true
 stream = ExtResource("20_82xsv")
-volume_db = -0.972
+volume_db = -4.86
 autoplay = true
 
 [node name="Tints" type="CanvasLayer" parent="." unique_id=501739394]
@@ -205,7 +206,7 @@ anchor_mode = 0
 
 [node name="Hangar" type="Marker2D" parent="." unique_id=566862702]
 unique_name_in_owner = true
-position = Vector2(127, 520)
+position = Vector2(312, 634)
 
 [connection signal="status_changed" from="Turret" to="HUD/AmmoLabel" method="set_text"]
 [connection signal="timeout" from="SpawnTimer" to="." method="_on_spawn_timer_timeout"]

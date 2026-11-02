@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cf5hgaocg652b" path="res://mini_ship.gd" id="1_lek37"]
 [ext_resource type="PackedScene" uid="uid://cah811pl7ulml" path="res://bullet.tscn" id="2_lov6l"]
-[ext_resource type="Texture2D" uid="uid://by7qau3pswtc7" path="res://mini_ship.png" id="3_lov6l"]
+[ext_resource type="Texture2D" uid="uid://ddaevaptyat1m" path="res://mini_ship.png" id="3_lov6l"]
 [ext_resource type="AudioStream" uid="uid://b05uhfi3bvuom" path="res://StandardBullet.wav" id="4_lov6l"]
 
 [node name="Node2D" type="Node2D" unique_id=1465952765]

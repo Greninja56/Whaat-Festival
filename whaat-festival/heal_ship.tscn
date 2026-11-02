@@ -22,4 +22,5 @@ shape = SubResource("CircleShape2D_vpvrv")
 [node name="Flying" type="AudioStreamPlayer2D" parent="." unique_id=1045212817]
 unique_name_in_owner = true
 stream = ExtResource("3_vuvdk")
+volume_db = -6.804
 autoplay = true

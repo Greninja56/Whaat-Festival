@@ -4,7 +4,7 @@ extends Node2D
 @export var heavy_scene: PackedScene
 @export var cloaked_scene: PackedScene
 @export_range(0.0, 1.0) var heavy_chance := 0.3
-@export_range(0.0, 1.0) var cloaked_chance := 0.1
+@export_range(0.0, 1.0) var cloaked_chance := 0.9
 @export var base_hp := 3
 @export var heavy_speed_mult := 0.25
 @export var heavy_hp_mult := 5
@@ -58,8 +58,8 @@ var shake_trauma := 0.0
 @onready var lives := max_lives
 
 @export var heal_ship_scene: PackedScene
-@export var heal_spawn_min := 5.0   # seconds between heal ships
-@export var heal_spawn_max := 10.0
+@export var heal_spawn_min := 40.0   # seconds between heal ships
+@export var heal_spawn_max := 60.0
 var heal_timer := 0.0
 
 var elapsed := 0.0

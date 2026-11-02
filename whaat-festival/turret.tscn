@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://c5lfm0pae5yml" path="res://turret.gd" id="1_3oylf"]
 [ext_resource type="PackedScene" uid="uid://cah811pl7ulml" path="res://bullet.tscn" id="2_c5apd"]
-[ext_resource type="Texture2D" uid="uid://btvj8elnj06ky" path="res://icon.svg" id="2_tjdg3"]
 [ext_resource type="PackedScene" uid="uid://dvcb1ooiidfb1" path="res://sonar_shot.tscn" id="3_coqkk"]
+[ext_resource type="Texture2D" uid="uid://bvx6o7v2bk7o8" path="res://turret.png" id="4_60y6o"]
 [ext_resource type="AudioStream" uid="uid://b05uhfi3bvuom" path="res://StandardBullet.wav" id="5_mhatg"]
 [ext_resource type="AudioStream" uid="uid://c1he1qm78bgjq" path="res://HeavyBullet.wav" id="6_vt3mo"]
 [ext_resource type="AudioStream" uid="uid://botm6chowbsyg" path="res://SonarShot.ogg" id="7_vt3mo"]
@@ -21,11 +21,11 @@ sonar_scene = ExtResource("3_coqkk")
 
 [node name="Visual" type="Sprite2D" parent="Node2D" unique_id=367961007]
 scale = Vector2(0.5, 0.5)
-texture = ExtResource("2_tjdg3")
+texture = ExtResource("4_60y6o")
 
 [node name="Gun" type="Marker2D" parent="." unique_id=125773595]
 unique_name_in_owner = true
-position = Vector2(0, -30)
+position = Vector2(0, -39)
 
 [node name="Standard" type="AudioStreamPlayer2D" parent="." unique_id=1485105573]
 unique_name_in_owner = true
@@ -34,6 +34,7 @@ stream = ExtResource("5_mhatg")
 [node name="Heavy" type="AudioStreamPlayer2D" parent="." unique_id=841907907]
 unique_name_in_owner = true
 stream = ExtResource("6_vt3mo")
+volume_db = -6.804
 
 [node name="Sonar" type="AudioStreamPlayer2D" parent="." unique_id=1899060480]
 unique_name_in_owner = true
