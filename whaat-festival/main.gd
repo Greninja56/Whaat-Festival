@@ -15,7 +15,7 @@ extends Node2D
 @export var token_time := 0.6
 @export var token_size := 6.0
 @export var token_color := Color(1.0, 0.85, 0.2)
-
+@export var menu_scene: PackedScene
 @export var reload_bar_size := Vector2(120, 10)
 @export var reload_bar_back := Color(0.1, 0.1, 0.1)
 
@@ -157,6 +157,8 @@ func _process(delta: float) -> void:
 	if game_over:
 		if not entering_name and Input.is_action_just_pressed("ui_accept"):
 			get_tree().reload_current_scene()
+		elif not entering_name and Input.is_action_just_pressed("ui_cancel"):
+			get_tree().change_scene_to_packed(menu_scene)
 		return
 	elapsed += delta
 	heal_timer -= delta
@@ -456,7 +458,7 @@ func _on_name_submitted(text: String) -> void:
 
 
 func _show_results() -> void:
-	label.text = "GAME OVER  Score: %d  (Enter to restart)" % score
+	label.text = "GAME OVER  Score: %d\nEnter: restart    Esc: menu" % score
 	leaderboard_label.text = _leaderboard_text()
 	leaderboard_label.visible = true
 

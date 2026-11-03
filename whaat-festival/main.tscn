@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cgcjpp1luc0t3" path="res://enemy.tscn" id="2_h2yge"]
 [ext_resource type="PackedScene" uid="uid://cgi012qqxplg3" path="res://slow_enemy.tscn" id="3_lquwl"]
 [ext_resource type="PackedScene" uid="uid://18cpu6nxqdsn" path="res://hidden_enemy.tscn" id="4_7mycd"]
+[ext_resource type="PackedScene" uid="uid://buanj733fx572" path="res://main_menu.tscn" id="5_1u8w0"]
 [ext_resource type="PackedScene" uid="uid://cjv8xoatkenqc" path="res://mini_ship.tscn" id="5_272bh"]
 [ext_resource type="PackedScene" uid="uid://bwlgqxi2khyct" path="res://heal_ship.tscn" id="6_5vw27"]
 [ext_resource type="Texture2D" uid="uid://nlb24y44bf01" path="res://background_image.png" id="7_cegan"]
@@ -50,6 +51,7 @@ script = ExtResource("1_ig7tw")
 enemy_scene = ExtResource("2_h2yge")
 heavy_scene = ExtResource("3_lquwl")
 cloaked_scene = ExtResource("4_7mycd")
+menu_scene = ExtResource("5_1u8w0")
 mini_ship_scene = ExtResource("5_272bh")
 heal_ship_scene = ExtResource("6_5vw27")
 
@@ -254,6 +256,7 @@ unique_name_in_owner = true
 stream = ExtResource("20_82xsv")
 volume_db = -4.86
 autoplay = true
+bus = &"Music"
 
 [node name="Tints" type="CanvasLayer" parent="." unique_id=501739394]
 
