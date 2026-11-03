@@ -28,6 +28,7 @@ var cooldown := 0.0
 
 
 func _process(delta: float) -> void:
+	trail.emitting = state != State.ACTIVE
 	match state:
 		State.LAUNCH:
 			if _fly_to(station, delta):
@@ -134,3 +135,8 @@ func setup(from: Vector2, to: Vector2) -> void:
 	home = from
 	station = to
 	global_position = from
+
+var trail: FuelTrail
+
+func _ready() -> void:
+	trail = FuelTrail.attach(self, Vector2.DOWN, Vector2(0, 12), Color(1.0, 1.0, 1.0, 1.0), 10.0)

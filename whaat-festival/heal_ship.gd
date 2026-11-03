@@ -14,6 +14,7 @@ var right_x := 1200.0   # set by main so it knows where the screen ends
 func _ready() -> void:
 	hp = max_hp
 	add_to_group("heal_ships")
+	FuelTrail.attach(self, Vector2.LEFT, Vector2(-16, 0), Color(0.4, 1.0, 0.5), 8.0)
 
 
 func _process(delta: float) -> void:

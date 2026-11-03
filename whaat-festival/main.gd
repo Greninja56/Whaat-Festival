@@ -3,7 +3,7 @@ extends Node2D
 @export var enemy_scene: PackedScene
 @export var heavy_scene: PackedScene
 @export var cloaked_scene: PackedScene
-@export_range(0.0, 1.0) var heavy_chance := 0.3
+@export_range(0.0, 1.0) var heavy_chance := 0.9
 @export_range(0.0, 1.0) var cloaked_chance := 0.1
 @export var base_hp := 3
 @export var heavy_speed_mult := 0.25
@@ -11,9 +11,21 @@ extends Node2D
 @export var cloaked_speed_mult := 0.5
 @export var cloaked_hp_mult := 1
 
+@export var token_time := 0.6
+@export var token_size := 6.0
+@export var token_color := Color(1.0, 0.85, 0.2)
+
+@export var reload_bar_size := Vector2(120, 10)
+@export var reload_bar_back := Color(0.1, 0.1, 0.1)
+
+@onready var reload_bars: Array[ProgressBar] = [%ReloadNormal, %ReloadHeavy]
+
 @export var shake_max_offset := 14.0   # pixels at full trauma
 @export var shake_decay := 2.5         # trauma lost per second
-@onready var hangar: Marker2D = %Hangar
+@onready var hangar_left: Marker2D = %HangarLeft
+@onready var hangar_right: Marker2D = %HangarRight
+@export var center_gap := 120.0
+var next_side_left := true
 @onready var camera: Camera2D = %ScreenShake
 
 var shake_trauma := 0.0
@@ -25,10 +37,10 @@ var shake_trauma := 0.0
 @export var spawn_ramp := 0.01
 
 # Currency / mini ships
-@export var coin_normal := 1
-@export var coin_heavy := 3
-@export var coin_cloaked := 5
-@export var ship_cost := 5
+@export var coin_normal := 0.5
+@export var coin_heavy := 1
+@export var coin_cloaked := 0.75
+@export var ship_cost := 1
 @export var mini_ship_scene: PackedScene
 
 # EFFECT: oxygen
@@ -55,16 +67,17 @@ var shake_trauma := 0.0
 @onready var currency_label: Label = %CurrencyLabel
 @onready var music: AudioStreamPlayer2D = %Music
 @onready var hud: CanvasLayer = %HUD   # EFFECT: power failure
+@onready var sonar_bar: ProgressBar = %SonarBar
 @onready var lives := max_lives
 
 @export var heal_ship_scene: PackedScene
-@export var heal_spawn_min := 40.0   # seconds between heal ships
-@export var heal_spawn_max := 60.0
+@export var heal_spawn_min := 10.0   # seconds between heal ships
+@export var heal_spawn_max := 20.0
 var heal_timer := 0.0
 
 var elapsed := 0.0
 var game_over := false
-var currency := 100
+var currency := 5.0
 
 # EFFECT state
 var oxygen_active := false
@@ -127,6 +140,8 @@ func _ready() -> void:
 	_add_score(0)
 	tint_mat = edge_tint.material as ShaderMaterial
 	tint_mat.set_shader_parameter("strength", 0.0)
+	sonar_bar.max_value = turret.sonar_full_recharge_time
+	sonar_bar.show_percentage = false
 
 
 func _process(delta: float) -> void:
@@ -183,6 +198,8 @@ func _process(delta: float) -> void:
 		fix_sound.play()
 	_process_oxygen_leak(delta)
 	_update_edge_tint(delta)
+	_update_sonar_bar()
+	_update_reload_bars()
 
 func _active_problem_colors() -> Array[Color]:
 	var c: Array[Color] = []
@@ -289,29 +306,34 @@ func _on_enemy_reached_bottom() -> void:
 	_lose_lives(roundi(enemy_damage * mult))
 
 
-func _on_enemy_died(value: int, points: int) -> void:
-	_add_currency(value)
+func _on_enemy_died(value: float, pos: Vector2, points: int) -> void:
+	_spawn_token(pos, value)
 	_add_score(points)
 	die_sound.play()
 
 
-func _add_currency(amount: int) -> void:
-	currency += amount
-	currency_label.text = "Credits: %d" % currency
+func _add_currency(amount: float) -> void:
+	currency = snappedf(currency + amount, 0.01)   # avoids 0.30000000004 drift
+	currency_label.text = "Reinforcements: %s" % String.num(currency, 2)
 
 func _launch_mini_ship() -> void:
 	if hangar_disabled or currency < ship_cost:
 		return
 	_add_currency(-ship_cost)
 
+	var left := next_side_left
+	next_side_left = not next_side_left   # alternate sides each launch
+
 	var size := get_viewport_rect().size
-	var station := Vector2(
-		randf_range(ship_margin, size.x - ship_margin),
-		size.y - ship_margin
-	)
+	var door := hangar_left if left else hangar_right
+
+	var x_min := ship_margin if left else size.x * 0.5 + center_gap
+	var x_max := size.x * 0.5 - center_gap if left else size.x - ship_margin
+	var station := Vector2(randf_range(x_min, x_max), size.y - ship_margin)
+
 	var s := mini_ship_scene.instantiate() as MiniShip
 	add_child(s)
-	s.setup(hangar.global_position, station)
+	s.setup(door.global_position, station)
 
 func _lose_lives(amount: int) -> void:
 	if game_over:
@@ -461,3 +483,36 @@ func _update_shake(delta: float) -> void:
 	shake_trauma = maxf(shake_trauma - shake_decay * delta, 0.0)
 	var power := shake_trauma * shake_trauma   # squared, so small hits are subtle
 	camera.offset = Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * shake_max_offset * power
+
+func _update_sonar_bar() -> void:
+	sonar_bar.value = turret.sonar_progress
+	
+func _update_reload_bars() -> void:
+	for i in reload_bars.size():
+		var reloading := i == turret.current and turret.reload_left > 0.0
+		reload_bars[i].visible = reloading
+		if reloading:
+			reload_bars[i].value = turret.reload_progress()
+			
+func _spawn_token(world_pos: Vector2, value: float) -> void:
+	# World position -> screen position (accounts for the camera shake offset)
+	var start := get_viewport().get_canvas_transform() * world_pos
+	var end := currency_label.global_position + currency_label.size * 0.5
+
+	var t := Polygon2D.new()
+	var pts := PackedVector2Array()
+	for i in 12:
+		pts.append(Vector2.from_angle(TAU * i / 12.0) * token_size)
+	t.polygon = pts
+	t.color = token_color
+	t.position = start
+	hud.add_child(t)
+
+	var tween := create_tween()
+	tween.tween_property(t, "position", end, token_time) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(t, "scale", Vector2(0.5, 0.5), token_time)
+	tween.tween_callback(func() -> void:
+		_add_currency(value)
+		t.queue_free()
+	)

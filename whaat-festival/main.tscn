@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://nlb24y44bf01" path="res://background_image.png" id="7_cegan"]
 [ext_resource type="AudioStream" uid="uid://dq8yq7gdgfrnu" path="res://CloakedSpawn.wav" id="8_5vw27"]
 [ext_resource type="AudioStream" uid="uid://bb5bqdafnw2g2" path="res://EnemyExplode.wav" id="9_kek77"]
+[ext_resource type="FontFile" uid="uid://bo044occkvec4" path="res://space font/EdgeOfTheGalaxyRegular-OVEa6.otf" id="9_ryguw"]
 [ext_resource type="AudioStream" uid="uid://bhuuvskiyo101" path="res://OxygenAlarm.wav" id="10_4c57u"]
 [ext_resource type="AudioStream" uid="uid://dcu0glh4tb6nb" path="res://OverheatAlarm.wav" id="11_efxa6"]
 [ext_resource type="AudioStream" uid="uid://cqxr73t4ot43n" path="res://PowerDown.wav" id="12_dg77c"]
@@ -27,6 +28,15 @@ bg_color = Color(1, 0, 0.14117648, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_272bh"]
 bg_color = Color(0.3027566, 0.7082971, 1.92523e-07, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ryguw"]
+bg_color = Color(0, 0.7176471, 0.8745098, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0odxb"]
+bg_color = Color(0.06373504, 0.48548496, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1u8w0"]
+bg_color = Color(0.9321602, 0.27132592, 0.17650697, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pa267"]
 shader = ExtResource("21_getpj")
@@ -82,29 +92,34 @@ anchor_right = 1.0
 offset_left = -166.0
 offset_bottom = 27.0
 grow_horizontal = 0
+theme_override_fonts/font = ExtResource("9_ryguw")
+theme_override_font_sizes/font_size = 20
 theme_override_styles/background = SubResource("StyleBoxFlat_7mycd")
 theme_override_styles/fill = SubResource("StyleBoxFlat_272bh")
 
 [node name="CurrencyLabel" type="Label" parent="HUD" unique_id=1171820860]
 unique_name_in_owner = true
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -23.0
-offset_right = 40.0
-grow_vertical = 0
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_top = 32.0
+offset_bottom = 56.0
+grow_horizontal = 0
+theme_override_fonts/font = ExtResource("9_ryguw")
+theme_override_font_sizes/font_size = 22
 
 [node name="ScoreLabel" type="Label" parent="HUD" unique_id=1468139673]
 unique_name_in_owner = true
-anchors_preset = 3
+anchors_preset = 1
 anchor_left = 1.0
-anchor_top = 1.0
 anchor_right = 1.0
-anchor_bottom = 1.0
 offset_left = -40.0
-offset_top = -23.0
+offset_top = 58.0
+offset_bottom = 86.0
 grow_horizontal = 0
-grow_vertical = 0
+theme_override_fonts/font = ExtResource("9_ryguw")
+theme_override_font_sizes/font_size = 22
 
 [node name="Leaderboard" type="Label" parent="HUD" unique_id=126829388]
 unique_name_in_owner = true
@@ -124,6 +139,40 @@ offset_right = 34.25
 offset_bottom = 15.5
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="SonarBar" type="ProgressBar" parent="HUD" unique_id=1384741361]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 2)
+offset_left = 2.0
+offset_top = 114.0
+offset_right = 112.0
+offset_bottom = 118.0
+theme_override_styles/fill = SubResource("StyleBoxFlat_ryguw")
+max_value = 20.0
+step = 0.0
+value = 20.0
+show_percentage = false
+
+[node name="ReloadNormal" type="ProgressBar" parent="HUD" unique_id=1386218657]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 4)
+offset_top = 37.0
+offset_right = 200.0
+offset_bottom = 41.0
+theme_override_styles/fill = SubResource("StyleBoxFlat_0odxb")
+max_value = 1.0
+show_percentage = false
+
+[node name="ReloadHeavy" type="ProgressBar" parent="HUD" unique_id=927826492]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 4)
+offset_left = 1.0
+offset_top = 73.0
+offset_right = 151.0
+offset_bottom = 77.0
+theme_override_styles/fill = SubResource("StyleBoxFlat_1u8w0")
+max_value = 1.0
+show_percentage = false
 
 [node name="SpawnTimer" type="Timer" parent="." unique_id=795384298]
 unique_name_in_owner = true
@@ -204,9 +253,13 @@ mouse_filter = 2
 unique_name_in_owner = true
 anchor_mode = 0
 
-[node name="Hangar" type="Marker2D" parent="." unique_id=566862702]
+[node name="HangarLeft" type="Marker2D" parent="." unique_id=566862702]
 unique_name_in_owner = true
-position = Vector2(312, 634)
+position = Vector2(181, 672)
+
+[node name="HangarRight" type="Marker2D" parent="." unique_id=1454510314]
+unique_name_in_owner = true
+position = Vector2(979, 673)
 
 [connection signal="status_changed" from="Turret" to="HUD/AmmoLabel" method="set_text"]
 [connection signal="timeout" from="SpawnTimer" to="." method="_on_spawn_timer_timeout"]

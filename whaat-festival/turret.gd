@@ -30,9 +30,9 @@ var overheated := false
 
 var ammo_types: Array[Dictionary] = [
 	{"name": "Standard", "damage": 1, "shield_damage": 0.1, "mag": 30, "fire_rate": 8.0,
-	 "reload": 1.2, "speed": 600.0, "color": Color(1.0, 0.9, 0.3), "scale": 1.0},
+	 "reload": 1.2, "speed": 600.0, "color": Color(1.0, 0.9, 0.3), "scale": 1.0, "flash_size": 10.0, "flash_time": 0.05},
 	{"name": "Heavy", "damage": 3, "shield_damage": 3.0, "mag": 6, "fire_rate": 2.0,
-	 "reload": 2.0, "speed": 450.0, "color": Color(1.0, 0.4, 0.2), "scale": 1.5},
+	 "reload": 2.0, "speed": 450.0, "color": Color(1.0, 0.4, 0.2), "scale": 3.0, "flash_size": 22.0, "flash_time": 0.1},
 ]
 @onready var shoot_sounds: Array[AudioStreamPlayer2D] = [%Standard, %Heavy]
 @onready var sonar_sound: AudioStreamPlayer2D = %Sonar
@@ -195,6 +195,7 @@ func _shoot() -> void:
 		rate *= overheat_fire_mult
 	cooldown = 1.0 / rate
 	shoot_sounds[current].play()
+	_flash(ammo)
 
 	var b := bullet_scene.instantiate() as Bullet
 	b.velocity = Vector2.UP.rotated(global_rotation) * ammo["speed"]
@@ -215,14 +216,7 @@ func status_text() -> String:
 	var parts: Array[String] = []
 	for i in ammo_types.size():
 		var a := ammo_types[i]
-		var line := "[%d] %s %d/%d" % [i + 1, a["name"], mags[i], a["mag"]]
-		if i == current:
-			line = "> " + line
-			if reload_left > 0.0:
-				line += "  RELOADING..."
-			elif mags[i] == 0:
-				line += "  EMPTY - press R"
-		parts.append(line)
+		parts.append("%s %d/%d" % [a["name"], mags[i], a["mag"]])
 	parts.append("Sonar %d/%d" % [sonar_charges, sonar_max_charges])
 	return "\n".join(parts)
 	
@@ -259,3 +253,26 @@ func _try_empty_click() -> void:
 		return
 	empty_gun.play()
 	cooldown = 0.3   # stops the click repeating every frame while held
+
+func _flash(ammo: Dictionary) -> void:
+	var size: float = ammo["flash_size"]
+	var pts := PackedVector2Array()
+	for i in 8:
+		var ang := TAU * i / 8.0
+		var r := size if i % 2 == 0 else size * 0.45
+		pts.append(Vector2(cos(ang), sin(ang)) * r)
+
+	var f := Polygon2D.new()
+	f.polygon = pts
+	f.color = ammo["color"].lightened(0.5)   # brighter than the bullet
+	f.z_index = 1
+	gun.add_child(f)
+
+	var tween := create_tween()
+	tween.tween_property(f, "modulate:a", 0.0, ammo["flash_time"])
+	tween.tween_callback(f.queue_free)
+
+func reload_progress() -> float:
+	if reload_left <= 0.0:
+		return 0.0
+	return 1.0 - reload_left / ammo_types[current]["reload"]
