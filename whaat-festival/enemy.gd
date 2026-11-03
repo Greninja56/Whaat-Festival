@@ -1,7 +1,9 @@
 class_name Enemy
 extends Area2D
 
-signal died(value: int)
+signal died(value: float, pos: Vector2)
+@export var explosion_size := 1.5
+@export var currency_value := 1.0
 signal reached_bottom
 signal shield_broken
 
@@ -18,15 +20,22 @@ var max_shield := 0.0
 
 @onready var hp : float = max_hp
 @onready var visual: Sprite2D = $Body
-var currency_value := 10
+
+@export var trail_color := Color(0.942, 0.0, 0.186, 1.0)
+@export var trail_size := 5.0
+@export var trail_offset := Vector2(1, -24)
+
+var trail: FuelTrail
 
 func _ready() -> void:
+	trail = FuelTrail.attach(self, Vector2.UP, trail_offset, trail_color, trail_size)
 	_update_color()
 
 
 func _process(delta: float) -> void:
 	position.y += speed * delta
 	if position.y >= bottom_y:
+		Explosion.spawn(get_tree().current_scene, global_position, 2.0, Color(1.0, 0.25, 0.15))
 		reached_bottom.emit()
 		queue_free()
 
@@ -43,7 +52,8 @@ func hit(damage: float, shield_damage: float = 0.0) -> void:
 		return
 	hp -= damage
 	if hp <= 0:
-		died.emit(currency_value)
+		Explosion.spawn(get_tree().current_scene, global_position, explosion_size)
+		died.emit(currency_value, global_position)
 		queue_free()
 	else:
 		_update_color()

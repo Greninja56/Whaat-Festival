@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://cjv8xoatkenqc"]
 
 [ext_resource type="Script" uid="uid://cf5hgaocg652b" path="res://mini_ship.gd" id="1_lek37"]
-[ext_resource type="Texture2D" uid="uid://bvx5c0eilpclk" path="res://images.jpeg" id="2_e10vf"]
 [ext_resource type="PackedScene" uid="uid://cah811pl7ulml" path="res://bullet.tscn" id="2_lov6l"]
+[ext_resource type="Texture2D" uid="uid://ddaevaptyat1m" path="res://mini_ship.png" id="3_lov6l"]
+[ext_resource type="AudioStream" uid="uid://b05uhfi3bvuom" path="res://StandardBullet.wav" id="4_lov6l"]
 
 [node name="Node2D" type="Node2D" unique_id=1465952765]
 scale = Vector2(0.1, 0.1)
@@ -10,4 +11,16 @@ script = ExtResource("1_lek37")
 bullet_scene = ExtResource("2_lov6l")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1896365905]
-texture = ExtResource("2_e10vf")
+scale = Vector2(3, 3)
+texture = ExtResource("3_lov6l")
+
+[node name="Shoot" type="AudioStreamPlayer2D" parent="." unique_id=1130464107]
+unique_name_in_owner = true
+stream = ExtResource("4_lov6l")
+volume_db = -24.299
+max_polyphony = 10
+
+[node name="Muzzle" type="Marker2D" parent="." unique_id=1274945741]
+unique_name_in_owner = true
+position = Vector2(0, -240)
+scale = Vector2(10, 10)

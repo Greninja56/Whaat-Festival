@@ -10,6 +10,26 @@ extends Node2D
 @export var heavy_hp_mult := 5
 @export var cloaked_speed_mult := 0.5
 @export var cloaked_hp_mult := 1
+@export var death_blasts := 24
+@export var death_blast_gap := 0.08   # seconds between blasts
+@export var token_time := 0.6
+@export var token_size := 6.0
+@export var token_color := Color(1.0, 0.85, 0.2)
+@export var menu_scene: PackedScene
+@export var reload_bar_size := Vector2(120, 10)
+@export var reload_bar_back := Color(0.1, 0.1, 0.1)
+
+@onready var reload_bars: Array[ProgressBar] = [%ReloadNormal, %ReloadHeavy]
+
+@export var shake_max_offset := 14.0   # pixels at full trauma
+@export var shake_decay := 2.5         # trauma lost per second
+@onready var hangar_left: Marker2D = %HangarLeft
+@onready var hangar_right: Marker2D = %HangarRight
+@export var center_gap := 120.0
+var next_side_left := true
+@onready var camera: Camera2D = %ScreenShake
+
+var shake_trauma := 0.0
 
 @export var max_lives := 50
 @export var enemy_damage := 2
@@ -18,9 +38,9 @@ extends Node2D
 @export var spawn_ramp := 0.01
 
 # Currency / mini ships
-@export var coin_normal := 1
-@export var coin_heavy := 3
-@export var coin_cloaked := 5
+@export var coin_normal := 0.5
+@export var coin_heavy := 1
+@export var coin_cloaked := 0.75
 @export var ship_cost := 1
 @export var mini_ship_scene: PackedScene
 
@@ -35,18 +55,33 @@ extends Node2D
 @onready var label: Label = %GameOver
 @onready var spawn_timer: Timer = %SpawnTimer
 @onready var cloaked_sound: AudioStreamPlayer2D = %CloakedSpawn
+@onready var die_sound: AudioStreamPlayer2D = %EnemyDies
+@onready var oxygen_sound: AudioStreamPlayer2D = %OxygenAlarm
+@onready var overheat_sound: AudioStreamPlayer2D = %OverheatAlarm
+@onready var power_sound: AudioStreamPlayer2D = %PowerDown
+@onready var shield_sound: AudioStreamPlayer2D = %ShieldDown
+@onready var hangar_sound: AudioStreamPlayer2D = %HangarDown
+@onready var game_over_sound: AudioStreamPlayer2D = %GameOverSound
+@onready var heal_sound: AudioStreamPlayer2D = %Heal
+@onready var hurt_sound: AudioStreamPlayer2D = %Hurt
+@onready var fix_sound: AudioStreamPlayer2D = %Fixed
 @onready var currency_label: Label = %CurrencyLabel
+@onready var music: AudioStreamPlayer2D = %Music
 @onready var hud: CanvasLayer = %HUD   # EFFECT: power failure
+@onready var sonar_bar: ProgressBar = %SonarBar
 @onready var lives := max_lives
 
 @export var heal_ship_scene: PackedScene
-@export var heal_spawn_min := 5.0   # seconds between heal ships
-@export var heal_spawn_max := 10.0
+@export var heal_spawn_min := 10.0   # seconds between heal ships
+@export var heal_spawn_max := 20.0
 var heal_timer := 0.0
+
+@onready var bg: TextureRect = %Background
+
 
 var elapsed := 0.0
 var game_over := false
-var currency := 0
+var currency := 5.0
 
 # EFFECT state
 var oxygen_active := false
@@ -81,6 +116,20 @@ var entering_name := false
 @export_range(0.0, 1.0) var shield_chance_max := 0.6
 @export var shield_hp := 3.0
 
+@export var tint_cycle_time := 1.2     # seconds per color when several problems are active
+@export var tint_max_alpha := 0.3
+@export var tint_edge_min := 0.015   # thinnest point of the pulse
+@export var tint_edge_max := 0.025    # widest point of the pulse
+@export var tint_pulse := true
+
+@onready var edge_tint: ColorRect = %EdgeTint
+
+var tint_mat: ShaderMaterial
+var tint_index := 0
+var tint_timer := 0.0
+var tint_strength := 0.0
+var tint_color := Color.WHITE
+
 func _ready() -> void:
 	lives_bar.max_value = max_lives
 	lives_bar.value = lives
@@ -93,12 +142,23 @@ func _ready() -> void:
 	name_entry.text_submitted.connect(_on_name_submitted)
 	leaderboard_label.visible = false
 	_add_score(0)
+	tint_mat = edge_tint.material as ShaderMaterial
+	tint_mat.set_shader_parameter("strength", 0.0)
+	sonar_bar.max_value = turret.sonar_full_recharge_time
+	sonar_bar.show_percentage = false
+	bg.pivot_offset = bg.size * 0.5
+	var t := create_tween().set_loops()
+	t.tween_property(bg, "scale", Vector2(1.06, 1.06), 20.0).set_trans(Tween.TRANS_SINE)
+	t.tween_property(bg, "scale", Vector2.ONE, 20.0).set_trans(Tween.TRANS_SINE)
 
 
 func _process(delta: float) -> void:
+	_update_shake(delta)
 	if game_over:
 		if not entering_name and Input.is_action_just_pressed("ui_accept"):
 			get_tree().reload_current_scene()
+		elif not entering_name and Input.is_action_just_pressed("ui_cancel"):
+			get_tree().change_scene_to_packed(menu_scene)
 		return
 	elapsed += delta
 	heal_timer -= delta
@@ -114,30 +174,92 @@ func _process(delta: float) -> void:
 		_start_oxygen_leak()
 	if Input.is_action_just_pressed("fix_oxygen") and oxygen_active:
 		oxygen_active = false
+		oxygen_sound.stop()
+		fix_sound.play()
 		_add_score(score_fix)
 	if Input.is_action_just_pressed("overheat"):
 		turret.set_overheated(true)
+		overheat_sound.play()
 	if Input.is_action_just_pressed("fix_overheat") and turret.overheated:
 		turret.set_overheated(false)
+		overheat_sound.stop()
+		fix_sound.play()
 		_add_score(score_fix)
 	if Input.is_action_just_pressed("power_failure"):
 		_set_power_failure(true)
+		power_sound.play()
 	if Input.is_action_just_pressed("fix_power") and power_active:
 		_set_power_failure(false)
 		_add_score(score_fix)
+		fix_sound.play()
 	if Input.is_action_just_pressed("shield_failure"):
 		shield_active = true
+		shield_sound.play()
 	if Input.is_action_just_pressed("fix_shield") and shield_active:
 		shield_active = false
 		_add_score(score_fix)
+		fix_sound.play()
 	if Input.is_action_just_pressed("hangar_failure"):
 		_set_hangar_failure(true)
+		hangar_sound.play()
 	if Input.is_action_just_pressed("fix_hangar") and hangar_disabled:
 		_set_hangar_failure(false)
 		_add_score(score_fix)
+		fix_sound.play()
 	_process_oxygen_leak(delta)
+	_update_edge_tint(delta)
+	_update_sonar_bar()
+	_update_reload_bars()
+
+func _active_problem_colors() -> Array[Color]:
+	var c: Array[Color] = []
+	if turret.overheated:
+		c.append(Color(1.0, 0.2, 0.2))    # gun overheating: red
+	if power_active:
+		c.append(Color(0.45, 0.7, 1.0))  # power failure: blue
+	if oxygen_active:
+		c.append(Color(0.2, 1.0, 0.35))   # oxygen leak: green
+	if hangar_disabled:
+		c.append(Color(1.0, 0.9, 0.2))    # hangar offline: yellow
+	if shield_active:
+		c.append(Color.WHITE)             # shield failure: white
+	return c
 
 
+func _update_edge_tint(delta: float) -> void:
+	var colors := _active_problem_colors()
+	var target := 0.0
+
+	if colors.size() > 0:
+		target = tint_max_alpha
+		tint_index = tint_index % colors.size()
+
+		# Several problems: step to the next color on a timer
+		if colors.size() > 1:
+			tint_timer -= delta
+			if tint_timer <= 0.0:
+				tint_timer = tint_cycle_time
+				tint_index = (tint_index + 1) % colors.size()
+
+		if tint_strength < 0.01:
+			tint_color = colors[tint_index]   # fading in from nothing: no color slide
+		else:
+			tint_color = tint_color.lerp(colors[tint_index], 1.0 - exp(-8.0 * delta))
+	else:
+		tint_index = 0
+		tint_timer = 0.0
+
+	tint_strength = move_toward(tint_strength, target, delta * 2.0)
+
+	var edge := tint_edge_max
+	if tint_pulse:
+		var wave := 0.5 + 0.5 * sin(elapsed * 6.0)   # 0..1
+		edge = lerpf(tint_edge_min, tint_edge_max, wave)
+
+	tint_mat.set_shader_parameter("tint", tint_color)
+	tint_mat.set_shader_parameter("strength", tint_strength)
+	tint_mat.set_shader_parameter("edge_size", edge)
+	
 func _on_spawn_timer_timeout() -> void:
 	_spawn_enemy()
 	spawn_timer.start(maxf(spawn_min, spawn_start - elapsed * spawn_ramp))
@@ -194,35 +316,41 @@ func _on_enemy_reached_bottom() -> void:
 	_lose_lives(roundi(enemy_damage * mult))
 
 
-func _on_enemy_died(value: int, points: int) -> void:
-	_add_currency(value)
+func _on_enemy_died(value: float, pos: Vector2, points: int) -> void:
+	_spawn_token(pos, value)
 	_add_score(points)
+	die_sound.play()
 
 
-func _add_currency(amount: int) -> void:
-	currency += amount
-	currency_label.text = "Credits: %d" % currency
+func _add_currency(amount: float) -> void:
+	currency = snappedf(currency + amount, 0.01)   # avoids 0.30000000004 drift
+	currency_label.text = "Reinforcements: %s" % String.num(currency, 2)
 
 func _launch_mini_ship() -> void:
 	if hangar_disabled or currency < ship_cost:
 		return
-	if currency < ship_cost:
-		return
 	_add_currency(-ship_cost)
 
-	var size := get_viewport_rect().size
-	var s := mini_ship_scene.instantiate()
-	add_child(s)
-	s.global_position = Vector2(
-		randf_range(ship_margin, size.x - ship_margin),
-		size.y - ship_margin
-	)
+	var left := next_side_left
+	next_side_left = not next_side_left   # alternate sides each launch
 
+	var size := get_viewport_rect().size
+	var door := hangar_left if left else hangar_right
+
+	var x_min := ship_margin if left else size.x * 0.5 + center_gap
+	var x_max := size.x * 0.5 - center_gap if left else size.x - ship_margin
+	var station := Vector2(randf_range(x_min, x_max), size.y - ship_margin)
+
+	var s := mini_ship_scene.instantiate() as MiniShip
+	add_child(s)
+	s.setup(door.global_position, station)
 
 func _lose_lives(amount: int) -> void:
 	if game_over:
 		return
 	lives = maxi(lives - amount, 0)
+	_shake(0.3 + 0.15 * amount)
+	hurt_sound.play()
 	if lives == 0:
 		_end_game()
 	_update_label()
@@ -230,10 +358,15 @@ func _lose_lives(amount: int) -> void:
 
 func _end_game() -> void:
 	game_over = true
+	oxygen_sound.stop()
 	oxygen_active = false
 	shield_active = false
 	hangar_disabled = false
+	music.stop()
+	game_over_sound.play()
+	_death_explosions()
 	spawn_timer.stop()
+	edge_tint.visible = false
 	turret.process_mode = Node.PROCESS_MODE_DISABLED
 	for e in get_tree().get_nodes_in_group("enemies"):
 		e.queue_free()
@@ -261,6 +394,7 @@ func _start_oxygen_leak() -> void:
 		return
 	oxygen_active = true
 	oxygen_tick_timer = oxygen_tick
+	oxygen_sound.play()
 
 
 func _process_oxygen_leak(delta: float) -> void:
@@ -293,6 +427,7 @@ func _on_heal_collected(amount: int) -> void:
 	if game_over:
 		return
 	lives = mini(lives + amount, max_lives)
+	heal_sound.play()
 	_update_label()
 	
 func _add_score(amount: int) -> void:
@@ -323,7 +458,7 @@ func _on_name_submitted(text: String) -> void:
 
 
 func _show_results() -> void:
-	label.text = "GAME OVER  Score: %d  (Enter to restart)" % score
+	label.text = "GAME OVER  Score: %d\nEnter: restart    Esc: menu" % score
 	leaderboard_label.text = _leaderboard_text()
 	leaderboard_label.visible = true
 
@@ -350,3 +485,66 @@ func _load_leaderboard() -> void:
 func _save_leaderboard() -> void:
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	f.store_string(JSON.stringify(leaderboard))
+	
+func _shake(amount: float) -> void:
+	shake_trauma = minf(shake_trauma + amount, 1.0)
+
+
+func _update_shake(delta: float) -> void:
+	shake_trauma = maxf(shake_trauma - shake_decay * delta, 0.0)
+	var power := shake_trauma * shake_trauma   # squared, so small hits are subtle
+	camera.offset = Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * shake_max_offset * power
+
+func _update_sonar_bar() -> void:
+	sonar_bar.value = turret.sonar_progress
+	
+func _update_reload_bars() -> void:
+	for i in reload_bars.size():
+		var reloading := i == turret.current and turret.reload_left > 0.0
+		reload_bars[i].visible = reloading
+		if reloading:
+			reload_bars[i].value = turret.reload_progress()
+			
+func _spawn_token(world_pos: Vector2, value: float) -> void:
+	# World position -> screen position (accounts for the camera shake offset)
+	var start := get_viewport().get_canvas_transform() * world_pos
+	var end := currency_label.global_position + currency_label.size * 0.5
+
+	var t := Polygon2D.new()
+	var pts := PackedVector2Array()
+	for i in 12:
+		pts.append(Vector2.from_angle(TAU * i / 12.0) * token_size)
+	t.polygon = pts
+	t.color = token_color
+	t.position = start
+	hud.add_child(t)
+
+	var tween := create_tween()
+	tween.tween_property(t, "position", end, token_time) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(t, "scale", Vector2(0.5, 0.5), token_time)
+	tween.tween_callback(func() -> void:
+		_add_currency(value)
+		t.queue_free()
+	)
+	
+func _death_explosions() -> void:
+	var size := get_viewport_rect().size
+	var center := turret.global_position
+
+	var tween := create_tween()
+	for i in death_blasts:
+		tween.tween_callback(func() -> void:
+			var pos := center + Vector2(randf_range(-size.x * 0.35, size.x * 0.35), randf_range(-size.y * 0.3, 40.0))
+			var col := Color(1.0, randf_range(0.2, 0.7), 0.1)
+			Explosion.spawn(self, pos, randf_range(1.5, 3.5), col)
+			_shake(0.25)
+		)
+		tween.tween_interval(death_blast_gap)
+
+	# Final big blast on the turret
+	tween.tween_callback(func() -> void:
+		Explosion.spawn(self, center, 6.0, Color(1.0, 0.5, 0.15))
+		_shake(1.0)
+		turret.visible = false
+	)

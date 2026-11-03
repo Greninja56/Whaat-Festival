@@ -30,12 +30,15 @@ var overheated := false
 
 var ammo_types: Array[Dictionary] = [
 	{"name": "Standard", "damage": 1, "shield_damage": 0.1, "mag": 30, "fire_rate": 8.0,
-	 "reload": 1.2, "speed": 600.0, "color": Color(1.0, 0.9, 0.3)},
+	 "reload": 1.2, "speed": 600.0, "color": Color(1.0, 0.9, 0.3), "scale": 1.0, "flash_size": 10.0, "flash_time": 0.05},
 	{"name": "Heavy", "damage": 3, "shield_damage": 3.0, "mag": 6, "fire_rate": 2.0,
-	 "reload": 2.0, "speed": 450.0, "color": Color(1.0, 0.4, 0.2)},
+	 "reload": 2.0, "speed": 450.0, "color": Color(1.0, 0.4, 0.2), "scale": 3.0, "flash_size": 22.0, "flash_time": 0.1},
 ]
 @onready var shoot_sounds: Array[AudioStreamPlayer2D] = [%Standard, %Heavy]
 @onready var sonar_sound: AudioStreamPlayer2D = %Sonar
+@onready var empty_gun: AudioStreamPlayer2D = %Empty
+@onready var reload_sound: AudioStreamPlayer2D = %Reloading
+@onready var switch_sound: AudioStreamPlayer2D = %Switch
 
 var udp := PacketPeerUDP.new()
 var cooldown := 0.0
@@ -69,8 +72,11 @@ func _process(delta: float) -> void:
 	_update_sonar(delta)
 
 	cooldown = maxf(cooldown - delta, 0.0)
-	if hold_to_fire and Input.is_action_pressed("fire") and _can_shoot():
-		_shoot()
+	if hold_to_fire and Input.is_action_pressed("fire"):
+		if _can_shoot():
+			_shoot()
+		else:
+			_try_empty_click()
 
 
 func _read_packets() -> void:
@@ -102,6 +108,7 @@ func _update_reload(delta: float) -> void:
 	reload_left -= delta
 	if reload_left <= 0.0:
 		reload_left = 0.0
+		reload_sound.stop()
 		mags[current] = ammo_types[current]["mag"]
 		status_changed.emit(status_text())
 
@@ -134,8 +141,11 @@ func _handle(s: Dictionary) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not hold_to_fire and event.is_action_pressed("fire") and _can_shoot():
-		_shoot()
+	if not hold_to_fire and event.is_action_pressed("fire"):
+		if _can_shoot():
+			_shoot()
+		else:
+			_try_empty_click()
 	elif event.is_action_pressed("center"):
 		center_yaw = raw_yaw
 		target_angle = 0.0
@@ -158,6 +168,8 @@ func _switch_to(index: int) -> void:
 		return
 	current = index
 	reload_left = 0.0
+	reload_sound.stop()
+	switch_sound.play()
 	cooldown = 0.15
 	status_changed.emit(status_text())
 
@@ -166,6 +178,8 @@ func _start_reload() -> void:
 	if reload_left > 0.0 or mags[current] >= ammo_types[current]["mag"]:
 		return
 	reload_left = ammo_types[current]["reload"]
+	reload_sound.pitch_scale = reload_sound.stream.get_length() / reload_left
+	reload_sound.play()
 	status_changed.emit(status_text())
 
 
@@ -181,16 +195,19 @@ func _shoot() -> void:
 		rate *= overheat_fire_mult
 	cooldown = 1.0 / rate
 	shoot_sounds[current].play()
+	_flash(ammo)
 
 	var b := bullet_scene.instantiate() as Bullet
 	b.velocity = Vector2.UP.rotated(global_rotation) * ammo["speed"]
 	b.damage = ammo["damage"]
 	b.shield_damage = ammo["shield_damage"]
 	b.modulate = ammo["color"]
+	b.scale = Vector2.ONE * ammo["scale"]
 
 	var parent := bullet_parent if bullet_parent else get_tree().current_scene
 	parent.add_child(b)
 	b.global_position = gun.global_position
+	b.global_rotation = gun.global_rotation
 
 	status_changed.emit(status_text())
 
@@ -199,14 +216,7 @@ func status_text() -> String:
 	var parts: Array[String] = []
 	for i in ammo_types.size():
 		var a := ammo_types[i]
-		var line := "[%d] %s %d/%d" % [i + 1, a["name"], mags[i], a["mag"]]
-		if i == current:
-			line = "> " + line
-			if reload_left > 0.0:
-				line += "  RELOADING..."
-			elif mags[i] == 0:
-				line += "  EMPTY - press R"
-		parts.append(line)
+		parts.append("%s %d/%d" % [a["name"], mags[i], a["mag"]])
 	parts.append("Sonar %d/%d" % [sonar_charges, sonar_max_charges])
 	return "\n".join(parts)
 	
@@ -229,6 +239,7 @@ func _fire_sonar() -> void:
 	var parent := bullet_parent if bullet_parent else get_tree().current_scene
 	parent.add_child(s)
 	s.global_position = gun.global_position
+	s.global_rotation = global_rotation
 
 	status_changed.emit(status_text())
 	
@@ -236,3 +247,32 @@ func set_overheated(value: bool) -> void:
 	overheated = value
 	modulate = Color(1.0, 0.3, 0.3) if value else Color.WHITE
 	status_changed.emit(status_text())
+	
+func _try_empty_click() -> void:
+	if mags[current] > 0 or reload_left > 0.0 or cooldown > 0.0:
+		return
+	empty_gun.play()
+	cooldown = 0.3   # stops the click repeating every frame while held
+
+func _flash(ammo: Dictionary) -> void:
+	var size: float = ammo["flash_size"]
+	var pts := PackedVector2Array()
+	for i in 8:
+		var ang := TAU * i / 8.0
+		var r := size if i % 2 == 0 else size * 0.45
+		pts.append(Vector2(cos(ang), sin(ang)) * r)
+
+	var f := Polygon2D.new()
+	f.polygon = pts
+	f.color = ammo["color"].lightened(0.5)   # brighter than the bullet
+	f.z_index = 1
+	gun.add_child(f)
+
+	var tween := create_tween()
+	tween.tween_property(f, "modulate:a", 0.0, ammo["flash_time"])
+	tween.tween_callback(f.queue_free)
+
+func reload_progress() -> float:
+	if reload_left <= 0.0:
+		return 0.0
+	return 1.0 - reload_left / ammo_types[current]["reload"]

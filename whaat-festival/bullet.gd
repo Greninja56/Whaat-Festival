@@ -13,4 +13,5 @@ var shield_damage := 0.1   # weak by default, so mini ships can't strip shields
 func _on_area_entered(area: Area2D) -> void:
 	if area.has_method("hit"):
 		area.hit(damage, shield_damage)
+		Explosion.spawn(get_tree().current_scene, global_position, 0.4 * scale.x, modulate)
 		queue_free()

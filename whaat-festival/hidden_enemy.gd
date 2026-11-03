@@ -9,19 +9,20 @@ var revealed := false
 
 
 func _ready() -> void:
+	trail_color = Color(0.821, 0.367, 0.984, 1.0)
 	super._ready()
 	_apply_visibility()
+	
+func _apply_visibility() -> void:
+	visual.self_modulate.a = 1.0 if revealed else cloaked_alpha
+	trail.visible = revealed
 
 
-# cloaked_enemy.gd
 func reveal() -> void:
 	if revealed:
 		return
 	revealed = true
+	trail.visible = true
 	reveal_sound.play()
 	var tween := create_tween()
 	tween.tween_property(visual, "self_modulate:a", 1.0, reveal_fade_time)
-
-
-func _apply_visibility() -> void:
-	visual.self_modulate.a = 1.0 if revealed else cloaked_alpha

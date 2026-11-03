@@ -2,14 +2,19 @@
 
 [ext_resource type="PackedScene" uid="uid://cgcjpp1luc0t3" path="res://enemy.tscn" id="1_12e31"]
 [ext_resource type="Script" uid="uid://bok52ti8plj2w" path="res://slow_enemy.gd" id="2_ji5ft"]
-[ext_resource type="Texture2D" uid="uid://dkuen6ka14280" path="res://bob_builder.jpeg" id="3_ji5ft"]
+[ext_resource type="Texture2D" uid="uid://mwtnkmek3ec5" path="res://slow_enemy.png" id="3_ji5ft"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ji5ft"]
+radius = 21.0
 
 [node name="Enemy" unique_id=970148408 instance=ExtResource("1_12e31")]
 script = ExtResource("2_ji5ft")
 
 [node name="CollisionShape2D" parent="." index="0" unique_id=730993054]
 scale = Vector2(5, 5)
+shape = SubResource("CircleShape2D_ji5ft")
 
 [node name="Body" parent="." index="1" unique_id=914568797]
-scale = Vector2(0.3, 0.3)
+position = Vector2(2, 0)
+scale = Vector2(0.16, 0.16)
 texture = ExtResource("3_ji5ft")

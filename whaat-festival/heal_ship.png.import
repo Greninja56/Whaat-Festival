@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bvx5c0eilpclk"
-path="res://.godot/imported/images.jpeg-6fb4d4316e9a32b4712b298f1d1e818b.ctex"
+uid="uid://ddreheq710oom"
+path="res://.godot/imported/heal_ship.png-5e1417ea5c421ad7581c4ce04bdf282d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images.jpeg"
-dest_files=["res://.godot/imported/images.jpeg-6fb4d4316e9a32b4712b298f1d1e818b.ctex"]
+source_file="res://heal_ship.png"
+dest_files=["res://.godot/imported/heal_ship.png-5e1417ea5c421ad7581c4ce04bdf282d.ctex"]
 
 [params]
 
