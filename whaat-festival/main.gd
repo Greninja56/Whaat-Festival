@@ -10,7 +10,8 @@ extends Node2D
 @export var heavy_hp_mult := 5
 @export var cloaked_speed_mult := 0.5
 @export var cloaked_hp_mult := 1
-
+@export var death_blasts := 24
+@export var death_blast_gap := 0.08   # seconds between blasts
 @export var token_time := 0.6
 @export var token_size := 6.0
 @export var token_color := Color(1.0, 0.85, 0.2)
@@ -74,6 +75,9 @@ var shake_trauma := 0.0
 @export var heal_spawn_min := 10.0   # seconds between heal ships
 @export var heal_spawn_max := 20.0
 var heal_timer := 0.0
+
+@onready var bg: TextureRect = %Background
+
 
 var elapsed := 0.0
 var game_over := false
@@ -142,6 +146,10 @@ func _ready() -> void:
 	tint_mat.set_shader_parameter("strength", 0.0)
 	sonar_bar.max_value = turret.sonar_full_recharge_time
 	sonar_bar.show_percentage = false
+	bg.pivot_offset = bg.size * 0.5
+	var t := create_tween().set_loops()
+	t.tween_property(bg, "scale", Vector2(1.06, 1.06), 20.0).set_trans(Tween.TRANS_SINE)
+	t.tween_property(bg, "scale", Vector2.ONE, 20.0).set_trans(Tween.TRANS_SINE)
 
 
 func _process(delta: float) -> void:
@@ -354,6 +362,7 @@ func _end_game() -> void:
 	hangar_disabled = false
 	music.stop()
 	game_over_sound.play()
+	_death_explosions()
 	spawn_timer.stop()
 	edge_tint.visible = false
 	turret.process_mode = Node.PROCESS_MODE_DISABLED
@@ -515,4 +524,25 @@ func _spawn_token(world_pos: Vector2, value: float) -> void:
 	tween.tween_callback(func() -> void:
 		_add_currency(value)
 		t.queue_free()
+	)
+	
+func _death_explosions() -> void:
+	var size := get_viewport_rect().size
+	var center := turret.global_position
+
+	var tween := create_tween()
+	for i in death_blasts:
+		tween.tween_callback(func() -> void:
+			var pos := center + Vector2(randf_range(-size.x * 0.35, size.x * 0.35), randf_range(-size.y * 0.3, 40.0))
+			var col := Color(1.0, randf_range(0.2, 0.7), 0.1)
+			Explosion.spawn(self, pos, randf_range(1.5, 3.5), col)
+			_shake(0.25)
+		)
+		tween.tween_interval(death_blast_gap)
+
+	# Final big blast on the turret
+	tween.tween_callback(func() -> void:
+		Explosion.spawn(self, center, 6.0, Color(1.0, 0.5, 0.15))
+		_shake(1.0)
+		turret.visible = false
 	)

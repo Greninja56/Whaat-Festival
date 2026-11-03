@@ -2,7 +2,7 @@ class_name Enemy
 extends Area2D
 
 signal died(value: float, pos: Vector2)
-
+@export var explosion_size := 1.5
 @export var currency_value := 1.0
 signal reached_bottom
 signal shield_broken
@@ -35,6 +35,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	position.y += speed * delta
 	if position.y >= bottom_y:
+		Explosion.spawn(get_tree().current_scene, global_position, 2.0, Color(1.0, 0.25, 0.15))
 		reached_bottom.emit()
 		queue_free()
 
@@ -51,6 +52,7 @@ func hit(damage: float, shield_damage: float = 0.0) -> void:
 		return
 	hp -= damage
 	if hp <= 0:
+		Explosion.spawn(get_tree().current_scene, global_position, explosion_size)
 		died.emit(currency_value, global_position)
 		queue_free()
 	else:

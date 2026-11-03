@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://buanj733fx572"]
+
+[ext_resource type="AudioStream" uid="uid://rhip1hcrfgln" path="res://MainMenu.wav" id="1_06t4h"]
+
+[node name="MainMenu" type="Control" unique_id=386725782]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="TextureRect" parent="." unique_id=1224291432]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Music" type="AudioStreamPlayer2D" parent="." unique_id=618010480]
+stream = ExtResource("1_06t4h")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=537535964]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Title" type="Label" parent="VBoxContainer" unique_id=884842461]
+layout_mode = 2
+
+[node name="Play" type="Button" parent="VBoxContainer" unique_id=875287195]
+layout_mode = 2
+
+[node name="Instructions" type="Button" parent="VBoxContainer" unique_id=1878111522]
+layout_mode = 2
+
+[node name="Leaderboard" type="Button" parent="VBoxContainer" unique_id=1222675457]
+layout_mode = 2
+
+[node name="Settings" type="Button" parent="VBoxContainer" unique_id=351112660]
+layout_mode = 2
+
+[node name="LeaderPanel" type="PanelContainer" parent="." unique_id=1565415172]
+visible = false
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LeaderPanel" unique_id=634496746]
+layout_mode = 2
+
+[node name="LeaderboardText" type="Label" parent="LeaderPanel/VBoxContainer" unique_id=953424035]
+layout_mode = 2
+
+[node name="LeaderboardBack" type="Button" parent="LeaderPanel/VBoxContainer" unique_id=1339495449]
+layout_mode = 2
+
+[node name="InstructionPanel" type="PanelContainer" parent="." unique_id=577496033]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="InstructionPanel" unique_id=1460587080]
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="InstructionPanel/VBoxContainer" unique_id=1800352471]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="InstructionPanel/VBoxContainer" unique_id=2042966466]
+layout_mode = 2
