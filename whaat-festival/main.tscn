@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://bwlgqxi2khyct" path="res://heal_ship.tscn" id="6_5vw27"]
 [ext_resource type="Texture2D" uid="uid://nlb24y44bf01" path="res://background_image.png" id="7_cegan"]
 [ext_resource type="AudioStream" uid="uid://dq8yq7gdgfrnu" path="res://CloakedSpawn.wav" id="8_5vw27"]
+[ext_resource type="Script" uid="uid://d1y3ki2pf3byc" path="res://stars.gd" id="8_d13ii"]
 [ext_resource type="AudioStream" uid="uid://bb5bqdafnw2g2" path="res://EnemyExplode.wav" id="9_kek77"]
 [ext_resource type="FontFile" uid="uid://bo044occkvec4" path="res://space font/EdgeOfTheGalaxyRegular-OVEa6.otf" id="9_ryguw"]
 [ext_resource type="AudioStream" uid="uid://bhuuvskiyo101" path="res://OxygenAlarm.wav" id="10_4c57u"]
@@ -58,7 +59,23 @@ offset_right = 1153.0
 offset_bottom = 766.0
 texture = ExtResource("7_cegan")
 expand_mode = 1
-stretch_mode = 6
+
+[node name="Stars1" type="CPUParticles2D" parent="." unique_id=1801884490]
+script = ExtResource("8_d13ii")
+fall_speed = 15.0
+star_size = 1.0
+star_count = 80
+
+[node name="Stars2" type="CPUParticles2D" parent="." unique_id=1995959178]
+script = ExtResource("8_d13ii")
+fall_speed = 35.0
+star_count = 50
+
+[node name="Stars3" type="CPUParticles2D" parent="." unique_id=841479178]
+script = ExtResource("8_d13ii")
+fall_speed = 80.0
+star_size = 2.5
+star_count = 15
 
 [node name="Turret" parent="." unique_id=689885630 instance=ExtResource("2_0xm2m")]
 unique_name_in_owner = true
