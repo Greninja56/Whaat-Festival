@@ -1,7 +1,5 @@
 extends Control
 
-
-const SETTINGS_PATH := "user://settings.cfg"
 const LEADERBOARD_PATH := "user://leaderboard.json"
 
 @onready var buttons: Control = %Buttons
@@ -12,6 +10,8 @@ const LEADERBOARD_PATH := "user://leaderboard.json"
 @onready var music_slider: HSlider = %MusicSlider
 @onready var pictures: Control = %Pictures
 var starting := false
+@export var min_db := -40.0   # slider at 0 (silent below this)
+@export var max_db := 20.0     # slider at 1 (buses can go above 0 dB)
 @export var game_scene: PackedScene
 
 func _ready() -> void:
@@ -23,12 +23,17 @@ func _ready() -> void:
 	%InstructionsBack.pressed.connect(_close)
 	%SettingsBack.pressed.connect(_close)
 
-	master_slider.value_changed.connect(_on_volume_changed.bind("Master"))
-	music_slider.value_changed.connect(_on_volume_changed.bind("Music"))
-
+	for pair in [[master_slider, "Master"], [music_slider, "Music"]]:
+		var sl: HSlider = pair[0]
+		sl.min_value = 0.0
+		sl.max_value = 1.0
+		sl.step = 0.01
+		sl.set_value_no_signal(0.5)               # start in the middle
+		sl.value_changed.connect(_on_volume_changed.bind(pair[1]))
+		_apply_volume(0.5, pair[1])               # make the audio match the slider
+		
 	instructions_text.bbcode_enabled = true
 	instructions_text.text = _instructions()
-	_load_settings()
 	_close()
 
 
@@ -58,11 +63,11 @@ func _on_play() -> void:
 
 func _open(panel: Control) -> void:
 	buttons.visible = false
+	pictures.visible = false
 	for p in panels:
 		p.visible = (p == panel)
 	if panel == %LeaderPanel:
 		leaderboard_text.text = _leaderboard()
-		pictures.visible = false
 
 
 func _close() -> void:
@@ -90,29 +95,15 @@ func _leaderboard() -> String:
 
 # ---- Settings ----
 func _on_volume_changed(value: float, bus_name: String) -> void:
+	_apply_volume(value, bus_name)
+
+
+func _apply_volume(value: float, bus_name: String) -> void:
 	var idx := AudioServer.get_bus_index(bus_name)
 	if idx == -1:
 		return
-	AudioServer.set_bus_volume_db(idx, linear_to_db(value))
+	AudioServer.set_bus_volume_db(idx, lerpf(min_db, max_db, value))
 	AudioServer.set_bus_mute(idx, value <= 0.001)
-	_save_settings()
-
-
-func _load_settings() -> void:
-	var cfg := ConfigFile.new()
-	cfg.load(SETTINGS_PATH)   # fine if the file doesn't exist yet
-	master_slider.set_value_no_signal(cfg.get_value("audio", "Master", 1.0))
-	music_slider.set_value_no_signal(cfg.get_value("audio", "Music", 1.0))
-	_on_volume_changed(master_slider.value, "Master")
-	_on_volume_changed(music_slider.value, "Music")
-
-
-func _save_settings() -> void:
-	var cfg := ConfigFile.new()
-	cfg.set_value("audio", "Master", master_slider.value)
-	cfg.set_value("audio", "Music", music_slider.value)
-	cfg.save(SETTINGS_PATH)
-
 
 # ---- Instructions ----
 func _instructions() -> String:

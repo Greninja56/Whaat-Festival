@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://nlb24y44bf01" path="res://background_image.png" id="7_cegan"]
 [ext_resource type="AudioStream" uid="uid://dq8yq7gdgfrnu" path="res://CloakedSpawn.wav" id="8_5vw27"]
 [ext_resource type="Script" uid="uid://d1y3ki2pf3byc" path="res://stars.gd" id="8_d13ii"]
+[ext_resource type="Texture2D" uid="uid://c1ph0maqo12nd" path="res://ThomasShipBiggerEven.png" id="9_1u8w0"]
 [ext_resource type="AudioStream" uid="uid://bb5bqdafnw2g2" path="res://EnemyExplode.wav" id="9_kek77"]
 [ext_resource type="FontFile" uid="uid://bo044occkvec4" path="res://space font/EdgeOfTheGalaxyRegular-OVEa6.otf" id="9_ryguw"]
 [ext_resource type="AudioStream" uid="uid://bhuuvskiyo101" path="res://OxygenAlarm.wav" id="10_4c57u"]
@@ -78,9 +79,18 @@ fall_speed = 80.0
 star_size = 5.0
 star_count = 15
 
+[node name="TextureRect" type="TextureRect" parent="." unique_id=74325956]
+offset_left = -72.0
+offset_top = 530.0
+offset_right = 2488.0
+offset_bottom = 1170.0
+scale = Vector2(0.53, 0.53)
+texture = ExtResource("9_1u8w0")
+
 [node name="Turret" parent="." unique_id=689885630 instance=ExtResource("2_0xm2m")]
 unique_name_in_owner = true
-position = Vector2(576, 687)
+position = Vector2(576, 626)
+scale = Vector2(0.6, 0.6)
 
 [node name="Bullets" type="Node2D" parent="." unique_id=1277818847]
 
@@ -274,11 +284,11 @@ anchor_mode = 0
 
 [node name="HangarLeft" type="Marker2D" parent="." unique_id=566862702]
 unique_name_in_owner = true
-position = Vector2(181, 672)
+position = Vector2(356, 630)
 
 [node name="HangarRight" type="Marker2D" parent="." unique_id=1454510314]
 unique_name_in_owner = true
-position = Vector2(979, 673)
+position = Vector2(922, 631)
 
 [connection signal="status_changed" from="Turret" to="HUD/AmmoLabel" method="set_text"]
 [connection signal="timeout" from="SpawnTimer" to="." method="_on_spawn_timer_timeout"]

@@ -3,7 +3,7 @@ extends Node2D
 
 enum State { LAUNCH, ACTIVE, RETURN }
 
-@export var travel_speed := 400.0
+@export var travel_speed := 300.0
 
 var state := State.LAUNCH
 var home := Vector2.ZERO      # hangar position

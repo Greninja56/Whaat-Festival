@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ooebsiil3kds"
-path="res://.godot/imported/ThomasShipBigger.png-eab82115f16e23fee505eeeb5e54be74.ctex"
+uid="uid://c1ph0maqo12nd"
+path="res://.godot/imported/ThomasShipBiggerEven.png-deb724c1b14fdcfcc7aeabe01f43dfb7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ThomasShipBigger.png"
-dest_files=["res://.godot/imported/ThomasShipBigger.png-eab82115f16e23fee505eeeb5e54be74.ctex"]
+source_file="res://ThomasShipBiggerEven.png"
+dest_files=["res://.godot/imported/ThomasShipBiggerEven.png-deb724c1b14fdcfcc7aeabe01f43dfb7.ctex"]
 
 [params]
 
