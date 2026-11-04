@@ -28,7 +28,7 @@ var boot_lines: PackedStringArray = [
 	"ENGINES RUNNING AT FULL CAPACITY ..... OK",
 	"DISPLAY ACTIVATED .................... OK",
 	"ALL SYSTEMS NOMINAL",
-	"BATTLE STATION ARMED",
+	"W.R.S RANKIN ARMED",
 	"PREPARING JUMP TO LIGHTSPEED",
 	"",
 ]

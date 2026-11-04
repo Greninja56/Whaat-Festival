@@ -6,8 +6,6 @@ const LEADERBOARD_PATH := "user://leaderboard.json"
 @onready var panels: Array[Control] = [%LeaderPanel, %InstructionPanel, %SettingsPanel]
 @onready var leaderboard_text: Label = %LeaderboardText
 @onready var instructions_text: RichTextLabel = %InstructionsText
-@onready var master_slider: HSlider = %MasterSlider
-@onready var music_slider: HSlider = %MusicSlider
 @onready var pictures: Control = %Pictures
 var starting := false
 @export var min_db := -40.0   # slider at 0 (silent below this)
@@ -21,20 +19,16 @@ func _ready() -> void:
 	%SettingsButton.pressed.connect(_open.bind(%SettingsPanel))
 	%LeaderboardBack.pressed.connect(_close)
 	%InstructionsBack.pressed.connect(_close)
-	%SettingsBack.pressed.connect(_close)
-
-	for pair in [[master_slider, "Master"], [music_slider, "Music"]]:
-		var sl: HSlider = pair[0]
-		sl.min_value = 0.0
-		sl.max_value = 1.0
-		sl.step = 0.01
-		sl.set_value_no_signal(0.5)               # start in the middle
-		sl.value_changed.connect(_on_volume_changed.bind(pair[1]))
-		_apply_volume(0.5, pair[1])               # make the audio match the slider
-		
 	instructions_text.bbcode_enabled = true
 	instructions_text.text = _instructions()
 	_close()
+	%SettingsPanel.visibility_changed.connect(func() -> void:
+		if not %SettingsPanel.visible and not buttons.visible:
+			_close())
+	for bus in ["Master", "Music"]:
+		var idx := AudioServer.get_bus_index(bus)
+		if idx != -1:
+			AudioServer.set_bus_volume_db(idx, lerpf(-40.0, 6.0, 0.5))
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -91,19 +85,6 @@ func _leaderboard() -> String:
 		else:
 			lines.append("%2d.  --------  0" % [i + 1])
 	return "\n".join(lines)
-
-
-# ---- Settings ----
-func _on_volume_changed(value: float, bus_name: String) -> void:
-	_apply_volume(value, bus_name)
-
-
-func _apply_volume(value: float, bus_name: String) -> void:
-	var idx := AudioServer.get_bus_index(bus_name)
-	if idx == -1:
-		return
-	AudioServer.set_bus_volume_db(idx, lerpf(min_db, max_db, value))
-	AudioServer.set_bus_mute(idx, value <= 0.001)
 
 # ---- Instructions ----
 func _instructions() -> String:

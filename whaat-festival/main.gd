@@ -3,6 +3,7 @@ extends Node2D
 @export var enemy_scene: PackedScene
 @export var heavy_scene: PackedScene
 @export var cloaked_scene: PackedScene
+@onready var settings_panel: PanelContainer = %SettingsPanel
 @export_range(0.0, 1.0) var heavy_chance := 0.3
 @export_range(0.0, 1.0) var cloaked_chance := 0.3
 @export var base_hp := 3
@@ -43,7 +44,7 @@ var shake_trauma := 0.0
 @export var coin_cloaked := 0.75
 @export var ship_cost := 1
 @export var mini_ship_scene: PackedScene
-
+@export var station_y := 0.8   # fraction of screen height (0 = top, 1 = bottom)
 # EFFECT: oxygen
 @export var oxygen_tick := 1.0
 @export var oxygen_damage := 2
@@ -150,6 +151,8 @@ func _ready() -> void:
 	var t := create_tween().set_loops()
 	t.tween_property(bg, "scale", Vector2(1.06, 1.06), 20.0).set_trans(Tween.TRANS_SINE)
 	t.tween_property(bg, "scale", Vector2.ONE, 20.0).set_trans(Tween.TRANS_SINE)
+	settings_panel.visibility_changed.connect(func() -> void:
+		turret.ui_open = settings_panel.visible)
 
 
 func _process(delta: float) -> void:
@@ -339,7 +342,7 @@ func _launch_mini_ship() -> void:
 
 	var x_min := ship_margin if left else size.x * 0.5 + center_gap
 	var x_max := size.x * 0.5 - center_gap if left else size.x - ship_margin
-	var station := Vector2(randf_range(x_min, x_max), size.y - ship_margin)
+	var station := Vector2(randf_range(x_min, x_max), size.y * station_y)
 
 	var s := mini_ship_scene.instantiate() as MiniShip
 	add_child(s)
@@ -367,6 +370,8 @@ func _end_game() -> void:
 	_death_explosions()
 	spawn_timer.stop()
 	edge_tint.visible = false
+	settings_panel.close()
+	turret.ui_open = false
 	turret.process_mode = Node.PROCESS_MODE_DISABLED
 	for e in get_tree().get_nodes_in_group("enemies"):
 		e.queue_free()
@@ -548,3 +553,10 @@ func _death_explosions() -> void:
 		_shake(1.0)
 		turret.visible = false
 	)
+	
+func _unhandled_input(event: InputEvent) -> void:
+	if game_over or entering_name:
+		return
+	if event.is_action_pressed("ui_cancel"):
+		settings_panel.toggle()
+		turret.ui_open = settings_panel.visible

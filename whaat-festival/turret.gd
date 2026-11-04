@@ -2,7 +2,7 @@ class_name Turret
 extends Node2D
 
 signal status_changed(text: String)
-
+var ui_open := false
 @export var bullet_scene: PackedScene
 @export var bullet_parent: Node
 
@@ -72,7 +72,7 @@ func _process(delta: float) -> void:
 	_update_sonar(delta)
 
 	cooldown = maxf(cooldown - delta, 0.0)
-	if hold_to_fire and Input.is_action_pressed("fire"):
+	if hold_to_fire and not ui_open and Input.is_action_pressed("fire"):
 		if _can_shoot():
 			_shoot()
 		else:
@@ -91,6 +91,8 @@ func _read_packets() -> void:
 
 
 func _read_keyboard(delta: float) -> void:
+	if ui_open:
+		return
 	var key_axis := Input.get_axis("ui_left", "ui_right")
 	if key_axis == 0.0:
 		return

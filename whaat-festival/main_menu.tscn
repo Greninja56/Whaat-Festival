@@ -5,31 +5,9 @@
 [ext_resource type="Script" uid="uid://bk56wt0mgp64k" path="res://menu.gd" id="1_fu7sn"]
 [ext_resource type="PackedScene" uid="uid://wxd4lmoheoy2" path="res://main.tscn" id="2_qe12f"]
 [ext_resource type="Texture2D" uid="uid://ddaevaptyat1m" path="res://mini_ship.png" id="4_nlkkf"]
+[ext_resource type="PackedScene" uid="uid://bsinpsqt2rcq4" path="res://settings_panel.tscn" id="5_8qtwp"]
 [ext_resource type="Texture2D" uid="uid://bu5xsg08go3wn" path="res://normal.png" id="6_8qtwp"]
 [ext_resource type="Texture2D" uid="uid://c1ph0maqo12nd" path="res://ThomasShipBiggerEven.png" id="6_qe12f"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mg3m2"]
-bg_color = Color(0.6, 0.6, 0.6, 0)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8u0te"]
-bg_color = Color(0.52156866, 0.6745098, 0.24313726, 1)
-expand_margin_left = 2.0
-expand_margin_top = 3.0
-expand_margin_right = 2.0
-expand_margin_bottom = 3.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oiatc"]
-bg_color = Color(0.52156866, 0.6745098, 0.24313726, 1)
-expand_margin_left = 2.0
-expand_margin_top = 3.0
-expand_margin_right = 2.0
-expand_margin_bottom = 3.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ojb7r"]
-bg_color = Color(0.52156866, 0.6745098, 0.24313726, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e5qqf"]
-bg_color = Color(0.039215688, 0.33333334, 0.49803922, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fu7sn"]
 bg_color = Color(0.52156866, 0.6745098, 0.24313726, 1)
@@ -125,55 +103,13 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="SettingsPanel" type="PanelContainer" parent="." unique_id=2133378273]
+[node name="SettingsPanel" parent="." unique_id=1385216296 instance=ExtResource("5_8qtwp")]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -51.0
-offset_right = 20.0
-offset_bottom = 51.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_mg3m2")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPanel" unique_id=923999360]
-layout_mode = 2
-
-[node name="MasterVol" type="Label" parent="SettingsPanel/VBoxContainer" unique_id=197788081]
-layout_mode = 2
-text = "All Volume"
-horizontal_alignment = 1
-
-[node name="MasterSlider" type="HSlider" parent="SettingsPanel/VBoxContainer" unique_id=314908627]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_styles/slider = SubResource("StyleBoxFlat_8u0te")
-value = 50.0
-
-[node name="MusicVol" type="Label" parent="SettingsPanel/VBoxContainer" unique_id=1839187155]
-layout_mode = 2
-text = "Music Volume"
-horizontal_alignment = 1
-
-[node name="MusicSlider" type="HSlider" parent="SettingsPanel/VBoxContainer" unique_id=1018527157]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_styles/slider = SubResource("StyleBoxFlat_oiatc")
-value = 50.0
-
-[node name="SettingsBack" type="Button" parent="SettingsPanel/VBoxContainer" unique_id=1805721584]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_ojb7r")
-theme_override_styles/hover = SubResource("StyleBoxFlat_e5qqf")
-text = "Back"
+offset_left = -54.5
+offset_top = -58.5
+offset_right = 54.5
+offset_bottom = 58.5
 
 [node name="Buttons" type="Control" parent="." unique_id=601172268]
 unique_name_in_owner = true
