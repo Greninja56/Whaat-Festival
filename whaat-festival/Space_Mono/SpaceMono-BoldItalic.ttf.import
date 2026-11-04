@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://bm7ntxx7gj4x0"
-path="res://.godot/imported/EdgeOfTheGalaxyPoster-3zRAp.otf-fa47fd0a9564aa9e874b734b605c08d4.fontdata"
+uid="uid://v83o6uedommm"
+path="res://.godot/imported/SpaceMono-BoldItalic.ttf-30f01d4d250c9eab0637194ffe1d711e.fontdata"
 
 [deps]
 
-source_file="res://space font/EdgeOfTheGalaxyPoster-3zRAp.otf"
-dest_files=["res://.godot/imported/EdgeOfTheGalaxyPoster-3zRAp.otf-fa47fd0a9564aa9e874b734b605c08d4.fontdata"]
+source_file="res://Space_Mono/SpaceMono-BoldItalic.ttf"
+dest_files=["res://.godot/imported/SpaceMono-BoldItalic.ttf-30f01d4d250c9eab0637194ffe1d711e.fontdata"]
 
 [params]
 

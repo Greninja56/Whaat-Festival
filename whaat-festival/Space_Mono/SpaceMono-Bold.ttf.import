@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://bo044occkvec4"
-path="res://.godot/imported/EdgeOfTheGalaxyRegular-OVEa6.otf-488f0bb9c87edffe6e03da0fc321eab9.fontdata"
+uid="uid://rknobyegmyc6"
+path="res://.godot/imported/SpaceMono-Bold.ttf-683f1fb64214a9c576a13f41eac79841.fontdata"
 
 [deps]
 
-source_file="res://space font/EdgeOfTheGalaxyRegular-OVEa6.otf"
-dest_files=["res://.godot/imported/EdgeOfTheGalaxyRegular-OVEa6.otf-488f0bb9c87edffe6e03da0fc321eab9.fontdata"]
+source_file="res://Space_Mono/SpaceMono-Bold.ttf"
+dest_files=["res://.godot/imported/SpaceMono-Bold.ttf-683f1fb64214a9c576a13f41eac79841.fontdata"]
 
 [params]
 

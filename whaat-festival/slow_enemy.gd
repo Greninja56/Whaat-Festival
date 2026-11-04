@@ -6,6 +6,7 @@ func _ready() -> void:
 	trail_offset = Vector2(0, -100)
 	trail_color = Color(0.958, 0.383, 0.0, 1.0)
 	explosion_size = 3.0
+	shield_radius = 128.0
 	super._ready()
 	max_hp = 8
 	speed = 25.0

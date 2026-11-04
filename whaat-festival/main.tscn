@@ -6,15 +6,16 @@
 [ext_resource type="PackedScene" uid="uid://cgi012qqxplg3" path="res://slow_enemy.tscn" id="3_lquwl"]
 [ext_resource type="PackedScene" uid="uid://18cpu6nxqdsn" path="res://hidden_enemy.tscn" id="4_7mycd"]
 [ext_resource type="PackedScene" uid="uid://cjv8xoatkenqc" path="res://mini_ship.tscn" id="5_272bh"]
+[ext_resource type="PackedScene" uid="uid://buanj733fx572" path="res://main_menu.tscn" id="5_lswn8"]
 [ext_resource type="PackedScene" uid="uid://bwlgqxi2khyct" path="res://heal_ship.tscn" id="6_5vw27"]
 [ext_resource type="Texture2D" uid="uid://nlb24y44bf01" path="res://background_image.png" id="7_cegan"]
 [ext_resource type="AudioStream" uid="uid://dq8yq7gdgfrnu" path="res://CloakedSpawn.wav" id="8_5vw27"]
 [ext_resource type="Script" uid="uid://d1y3ki2pf3byc" path="res://stars.gd" id="8_d13ii"]
 [ext_resource type="Texture2D" uid="uid://c1ph0maqo12nd" path="res://ThomasShipBiggerEven.png" id="9_1u8w0"]
 [ext_resource type="AudioStream" uid="uid://bb5bqdafnw2g2" path="res://EnemyExplode.wav" id="9_kek77"]
-[ext_resource type="FontFile" uid="uid://bo044occkvec4" path="res://space font/EdgeOfTheGalaxyRegular-OVEa6.otf" id="9_ryguw"]
 [ext_resource type="AudioStream" uid="uid://bhuuvskiyo101" path="res://OxygenAlarm.wav" id="10_4c57u"]
 [ext_resource type="AudioStream" uid="uid://dcu0glh4tb6nb" path="res://OverheatAlarm.wav" id="11_efxa6"]
+[ext_resource type="Texture2D" uid="uid://ddaevaptyat1m" path="res://mini_ship.png" id="12_a6jrf"]
 [ext_resource type="AudioStream" uid="uid://cqxr73t4ot43n" path="res://PowerDown.wav" id="12_dg77c"]
 [ext_resource type="AudioStream" uid="uid://dk6c0gcil2dpx" path="res://ShieldDown.wav" id="13_ycdy4"]
 [ext_resource type="AudioStream" uid="uid://brpx3d01d6gct" path="res://HangarClosed.wav" id="14_w48qg"]
@@ -24,6 +25,7 @@
 [ext_resource type="AudioStream" uid="uid://i6t51dtbggn0" path="res://Fixed.wav" id="18_074og"]
 [ext_resource type="AudioStream" uid="uid://1qe0dwb7rdj" path="res://BackgroundGame.mp3" id="20_82xsv"]
 [ext_resource type="Shader" uid="uid://cfgpfrgudm2w1" path="res://main.gdshader" id="21_getpj"]
+[ext_resource type="Shader" uid="uid://cp3f5c4l6ghcx" path="res://static.gdshader" id="25_0odxb"]
 [ext_resource type="PackedScene" uid="uid://bsinpsqt2rcq4" path="res://settings_panel.tscn" id="25_lswn8"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7mycd"]
@@ -47,11 +49,20 @@ shader_parameter/tint = Color(1, 0, 0, 1)
 shader_parameter/strength = 0.0
 shader_parameter/edge_size = 0.3
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lswn8"]
+shader = ExtResource("25_0odxb")
+shader_parameter/brightness = 0.35
+shader_parameter/pixel_size = 3.0
+shader_parameter/contrast = 0.8
+shader_parameter/scanline_strength = 0.25
+shader_parameter/flicker_strength = 0.15
+
 [node name="Node2D" type="Node2D" unique_id=295050915]
 script = ExtResource("1_ig7tw")
 enemy_scene = ExtResource("2_h2yge")
 heavy_scene = ExtResource("3_lquwl")
 cloaked_scene = ExtResource("4_7mycd")
+menu_scene = ExtResource("5_lswn8")
 mini_ship_scene = ExtResource("5_272bh")
 heal_ship_scene = ExtResource("6_5vw27")
 
@@ -97,6 +108,7 @@ scale = Vector2(0.6, 0.6)
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=2084087761]
 unique_name_in_owner = true
+layer = 5
 
 [node name="AmmoLabel" type="Label" parent="HUD" unique_id=1495064037]
 offset_right = 40.0
@@ -121,7 +133,6 @@ anchor_right = 1.0
 offset_left = -166.0
 offset_bottom = 27.0
 grow_horizontal = 0
-theme_override_fonts/font = ExtResource("9_ryguw")
 theme_override_font_sizes/font_size = 20
 theme_override_styles/background = SubResource("StyleBoxFlat_7mycd")
 theme_override_styles/fill = SubResource("StyleBoxFlat_272bh")
@@ -133,10 +144,9 @@ anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -40.0
 offset_top = 32.0
-offset_bottom = 56.0
+offset_bottom = 65.0
 grow_horizontal = 0
-theme_override_fonts/font = ExtResource("9_ryguw")
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 18
 
 [node name="ScoreLabel" type="Label" parent="HUD" unique_id=1468139673]
 unique_name_in_owner = true
@@ -147,7 +157,6 @@ offset_left = -40.0
 offset_top = 58.0
 offset_bottom = 86.0
 grow_horizontal = 0
-theme_override_fonts/font = ExtResource("9_ryguw")
 theme_override_font_sizes/font_size = 22
 
 [node name="Leaderboard" type="Label" parent="HUD" unique_id=126829388]
@@ -202,6 +211,14 @@ offset_bottom = 77.0
 theme_override_styles/fill = SubResource("StyleBoxFlat_1u8w0")
 max_value = 1.0
 show_percentage = false
+
+[node name="ReinforcmentImage" type="TextureRect" parent="HUD" unique_id=1989789256]
+offset_left = 1071.0
+offset_top = 35.0
+offset_right = 1193.0
+offset_bottom = 157.0
+scale = Vector2(0.21, 0.21)
+texture = ExtResource("12_a6jrf")
 
 [node name="SpawnTimer" type="Timer" parent="." unique_id=795384298]
 unique_name_in_owner = true
@@ -300,6 +317,20 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(520, 330)
 size_flags_horizontal = 3
 size_flags_vertical = 3
+
+[node name="StaticLayer" type="CanvasLayer" parent="." unique_id=710943915]
+unique_name_in_owner = true
+layer = 2
+
+[node name="StaticRect" type="ColorRect" parent="StaticLayer" unique_id=416270217]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_lswn8")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
 [connection signal="status_changed" from="Turret" to="HUD/AmmoLabel" method="set_text"]
 [connection signal="timeout" from="SpawnTimer" to="." method="_on_spawn_timer_timeout"]

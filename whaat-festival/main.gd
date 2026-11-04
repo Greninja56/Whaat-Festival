@@ -5,7 +5,10 @@ extends Node2D
 @export var cloaked_scene: PackedScene
 @onready var settings_panel: PanelContainer = %SettingsPanel
 @export_range(0.0, 1.0) var heavy_chance := 0.3
-@export_range(0.0, 1.0) var cloaked_chance := 0.3
+@export_range(0.0, 1.0) var cloaked_chance := 0.2
+@export var static_delay := 0.8   # seconds after the final blast before the static cuts in
+@onready var static_rect: ColorRect = %StaticRect
+var results_ready := false
 @export var base_hp := 3
 @export var heavy_speed_mult := 0.25
 @export var heavy_hp_mult := 5
@@ -32,7 +35,7 @@ var next_side_left := true
 
 var shake_trauma := 0.0
 
-@export var max_lives := 50
+@export var max_lives := 10
 @export var enemy_damage := 2
 @export var spawn_start := 10.0
 @export var spawn_min := 1.0
@@ -139,7 +142,7 @@ func _ready() -> void:
 	_add_currency(0)
 	_load_leaderboard()
 	name_entry.visible = false
-	name_entry.max_length = 8
+	name_entry.max_length = 3
 	name_entry.text_submitted.connect(_on_name_submitted)
 	leaderboard_label.visible = false
 	_add_score(0)
@@ -153,11 +156,15 @@ func _ready() -> void:
 	t.tween_property(bg, "scale", Vector2.ONE, 20.0).set_trans(Tween.TRANS_SINE)
 	settings_panel.visibility_changed.connect(func() -> void:
 		turret.ui_open = settings_panel.visible)
+	static_rect.visible = false
+	_style_end_screen()
 
 
 func _process(delta: float) -> void:
 	_update_shake(delta)
 	if game_over:
+		if not results_ready:
+			return
 		if not entering_name and Input.is_action_just_pressed("ui_accept"):
 			get_tree().reload_current_scene()
 		elif not entering_name and Input.is_action_just_pressed("ui_cancel"):
@@ -327,7 +334,7 @@ func _on_enemy_died(value: float, pos: Vector2, points: int) -> void:
 
 func _add_currency(amount: float) -> void:
 	currency = snappedf(currency + amount, 0.01)   # avoids 0.30000000004 drift
-	currency_label.text = "Reinforcements: %s" % String.num(currency, 2)
+	currency_label.text = ": %s" % String.num(currency, 2)
 
 func _launch_mini_ship() -> void:
 	if hangar_disabled or currency < ship_cost:
@@ -362,6 +369,7 @@ func _lose_lives(amount: int) -> void:
 func _end_game() -> void:
 	game_over = true
 	oxygen_sound.stop()
+	overheat_sound.stop()
 	oxygen_active = false
 	shield_active = false
 	hangar_disabled = false
@@ -377,20 +385,11 @@ func _end_game() -> void:
 		e.queue_free()
 	for h in get_tree().get_nodes_in_group("heal_ships"):
 		h.queue_free()
-	if _qualifies():
-		entering_name = true
-		label.text = "GAME OVER  Score: %d\nNew high score! Enter your name:" % score
-		name_entry.text = ""
-		name_entry.visible = true
-		name_entry.grab_focus()
-	else:
-		_show_results()
+	_show_static_screen()
 
 
 func _update_label() -> void:
 	lives_bar.value = lives
-	if game_over:
-		label.visible = true
 
 
 # EFFECT functions
@@ -437,7 +436,7 @@ func _on_heal_collected(amount: int) -> void:
 	
 func _add_score(amount: int) -> void:
 	score += amount
-	score_label.text = "Score: %d   Best: %d" % [score, maxi(score, high_score)]
+	score_label.text = "Score: %d" % [score]
 
 func _qualifies() -> bool:
 	if score <= 0:
@@ -447,8 +446,8 @@ func _qualifies() -> bool:
 
 func _on_name_submitted(text: String) -> void:
 	var player_name := text.strip_edges().to_upper()
-	if player_name == "":
-		player_name = "???"
+	if player_name.length() < 3:
+		return
 	leaderboard.append({"name": player_name, "score": score})
 	leaderboard.sort_custom(func(a, b): return a["score"] > b["score"])
 	leaderboard.resize(mini(leaderboard.size(), MAX_ENTRIES))
@@ -560,3 +559,44 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		settings_panel.toggle()
 		turret.ui_open = settings_panel.visible
+		
+func _show_static_screen() -> void:
+	# let the death explosions finish first
+	await get_tree().create_timer(death_blasts * death_blast_gap + static_delay).timeout
+
+	# cut to static (quick fade so it punches in)
+	static_rect.modulate.a = 0.0
+	static_rect.visible = true
+	create_tween().tween_property(static_rect, "modulate:a", 1.0, 0.15)
+
+	# power failure hides the whole HUD, so restore it, then hide everything except the end screen
+	hud.visible = true
+	for child in hud.get_children():
+		if child is CanvasItem and child != label and child != leaderboard_label and child != name_entry:
+			child.visible = false
+
+	label.visible = true
+	if _qualifies():
+		entering_name = true
+		label.text = "GAME OVER\nScore: %d\nNew high score! Enter your name:" % score
+		name_entry.text = ""
+		name_entry.visible = true
+		name_entry.grab_focus()
+	else:
+		_show_results()
+	results_ready = true
+
+
+func _style_end_screen() -> void:
+	var size := get_viewport_rect().size
+	for l: Label in [label, leaderboard_label]:
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.add_theme_font_size_override("font_size", 28)
+		l.add_theme_constant_override("outline_size", 8)
+		l.add_theme_color_override("font_outline_color", Color.BLACK)
+	label.position.y = size.y * 0.1
+	leaderboard_label.size.x = size.x
+	leaderboard_label.position = Vector2(0, size.y * 0.3)
+	name_entry.custom_minimum_size = Vector2(260, 44)
+	name_entry.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_entry.add_theme_font_size_override("font_size", 24)

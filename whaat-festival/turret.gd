@@ -7,7 +7,7 @@ var ui_open := false
 @export var bullet_parent: Node
 
 @export var max_angle_deg := 80.0
-@export var physical_range_deg := 80.0
+@export var physical_range_deg := 40.0
 @export var port := 50000
 @export var smooth := 20.0
 @export var deadzone_deg := 0.5

@@ -23,6 +23,10 @@ buses/default_bus_layout="uid://ln42hifyxr1e"
 window/size/mode=3
 window/stretch/mode="canvas_items"
 
+[gui]
+
+theme/custom_font="uid://iovlxfbvyg1d"
+
 [input]
 
 fire={
