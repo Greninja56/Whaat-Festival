@@ -3,7 +3,6 @@
 [ext_resource type="AudioStream" uid="uid://rhip1hcrfgln" path="res://MainMenu.wav" id="1_06t4h"]
 [ext_resource type="Texture2D" uid="uid://nlb24y44bf01" path="res://background_image.png" id="1_7vrkn"]
 [ext_resource type="Script" uid="uid://bk56wt0mgp64k" path="res://menu.gd" id="1_fu7sn"]
-[ext_resource type="PackedScene" uid="uid://wxd4lmoheoy2" path="res://main.tscn" id="2_jix8l"]
 
 [node name="MainMenu" type="Control" unique_id=386725782]
 layout_mode = 3
@@ -13,7 +12,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_fu7sn")
-game_scene = ExtResource("2_jix8l")
 
 [node name="Background" type="TextureRect" parent="." unique_id=1224291432]
 unique_name_in_owner = true
@@ -32,33 +30,6 @@ unique_name_in_owner = true
 stream = ExtResource("1_06t4h")
 autoplay = true
 bus = &"Music"
-
-[node name="Buttons" type="VBoxContainer" parent="." unique_id=751205201]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 729.00006
-offset_top = 30.999992
-offset_right = 804.00006
-offset_bottom = 116.99999
-scale = Vector2(4.86029, 6.756992)
-
-[node name="Play" type="Button" parent="Buttons" unique_id=875287195]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(50, 10)
-layout_mode = 2
-text = "Play"
-
-[node name="Instructions" type="Button" parent="Buttons" unique_id=1878111522]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Leaderboard" type="Button" parent="Buttons" unique_id=1222675457]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Settings" type="Button" parent="Buttons" unique_id=351112660]
-unique_name_in_owner = true
-layout_mode = 2
 
 [node name="Title" type="Label" parent="." unique_id=884842461]
 unique_name_in_owner = true
@@ -155,3 +126,52 @@ layout_mode = 2
 [node name="SettingsBack" type="Button" parent="SettingsPanel/VBoxContainer" unique_id=1805721584]
 unique_name_in_owner = true
 layout_mode = 2
+
+[node name="Buttons" type="Control" parent="." unique_id=601172268]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayButton" type="Button" parent="Buttons" unique_id=421890031]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 824.0
+offset_top = 100.0
+offset_right = 964.0
+offset_bottom = 156.0
+theme_override_font_sizes/font_size = 20
+text = "Play"
+
+[node name="LeaderboardButton" type="Button" parent="Buttons" unique_id=109702910]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 824.0
+offset_top = 200.0
+offset_right = 964.0
+offset_bottom = 256.0
+theme_override_font_sizes/font_size = 20
+text = "Leaderboard"
+
+[node name="InstructionsButton" type="Button" parent="Buttons" unique_id=2063338895]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 824.0
+offset_top = 300.0
+offset_right = 964.0
+offset_bottom = 356.0
+theme_override_font_sizes/font_size = 20
+text = "Instructions"
+
+[node name="SettingsButton" type="Button" parent="Buttons" unique_id=1035666205]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 825.0
+offset_top = 408.0
+offset_right = 965.0
+offset_bottom = 464.0
+theme_override_font_sizes/font_size = 20
+text = "Settings"

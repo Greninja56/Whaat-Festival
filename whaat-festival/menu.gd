@@ -1,6 +1,5 @@
 extends Control
 
-@export var game_scene: PackedScene   # drag your game scene here
 
 const SETTINGS_PATH := "user://settings.cfg"
 const LEADERBOARD_PATH := "user://leaderboard.json"
@@ -15,8 +14,8 @@ const LEADERBOARD_PATH := "user://leaderboard.json"
 
 func _ready() -> void:
 	%Play.pressed.connect(_on_play)
-	%Leaderboard.pressed.connect(_open.bind(%LeaderboardPanel))
-	%Instructions.pressed.connect(_open.bind(%InstructionsPanel))
+	%Leaderboard.pressed.connect(_open.bind(%LeaderPanel))
+	%Instructions.pressed.connect(_open.bind(%InstructionPanel))
 	%Settings.pressed.connect(_open.bind(%SettingsPanel))
 	%LeaderboardBack.pressed.connect(_close)
 	%InstructionsBack.pressed.connect(_close)
@@ -37,14 +36,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_play() -> void:
-	get_tree().change_scene_to_packed(game_scene)
+	get_tree().change_scene_to_file("res://main.tscn")
 
 
 func _open(panel: Control) -> void:
 	buttons.visible = false
 	for p in panels:
 		p.visible = (p == panel)
-	if panel == %LeaderboardPanel:
+	if panel == %LeaderPanel:
 		leaderboard_text.text = _leaderboard()
 	# give keyboard/controller focus to the panel's back button
 	var back := panel.find_child("*Back", true, false) as Button
