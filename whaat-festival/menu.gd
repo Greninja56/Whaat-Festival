@@ -10,13 +10,15 @@ const LEADERBOARD_PATH := "user://leaderboard.json"
 @onready var instructions_text: RichTextLabel = %InstructionsText
 @onready var master_slider: HSlider = %MasterSlider
 @onready var music_slider: HSlider = %MusicSlider
-
+@onready var pictures: Control = %Pictures
+var starting := false
+@export var game_scene: PackedScene
 
 func _ready() -> void:
-	%Play.pressed.connect(_on_play)
-	%Leaderboard.pressed.connect(_open.bind(%LeaderPanel))
-	%Instructions.pressed.connect(_open.bind(%InstructionPanel))
-	%Settings.pressed.connect(_open.bind(%SettingsPanel))
+	%PlayButton.pressed.connect(_on_play)
+	%LeaderboardButton.pressed.connect(_open.bind(%LeaderPanel))
+	%InstructionsButton.pressed.connect(_open.bind(%InstructionPanel))
+	%SettingsButton.pressed.connect(_open.bind(%SettingsPanel))
 	%LeaderboardBack.pressed.connect(_close)
 	%InstructionsBack.pressed.connect(_close)
 	%SettingsBack.pressed.connect(_close)
@@ -36,8 +38,23 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_play() -> void:
-	get_tree().change_scene_to_file("res://main.tscn")
+	if starting:
+		return
+	starting = true
 
+	var layer := CanvasLayer.new()
+	layer.layer = 100                      # above everything
+	add_child(layer)
+
+	var boot := BootSequence.new()
+	layer.add_child(boot)
+	boot.position = Vector2.ZERO
+	boot.size = get_viewport_rect().size   # don't rely on anchors
+	var fade := create_tween()
+	fade.tween_property(%Music, "volume_db", -40.0, 4.0)
+	await boot.run()
+
+	get_tree().change_scene_to_packed(game_scene)
 
 func _open(panel: Control) -> void:
 	buttons.visible = false
@@ -45,30 +62,29 @@ func _open(panel: Control) -> void:
 		p.visible = (p == panel)
 	if panel == %LeaderPanel:
 		leaderboard_text.text = _leaderboard()
-	# give keyboard/controller focus to the panel's back button
-	var back := panel.find_child("*Back", true, false) as Button
-	if back:
-		back.grab_focus()
+		pictures.visible = false
 
 
 func _close() -> void:
 	for p in panels:
 		p.visible = false
 	buttons.visible = true
-	%Play.grab_focus()
+	pictures.visible = true
 
 # ---- Leaderboard ----
 func _leaderboard() -> String:
-	var lines: Array[String] = ["HIGH SCORES", ""]
+	var lines: Array[String] = []
 	var data = null
 	if FileAccess.file_exists(LEADERBOARD_PATH):
 		var f := FileAccess.open(LEADERBOARD_PATH, FileAccess.READ)
 		data = JSON.parse_string(f.get_as_text())
-	if data is Array and not data.is_empty():
-		for i in data.size():
-			lines.append("%d. %s   %d" % [i + 1, data[i]["name"], int(data[i]["score"])])
-	else:
-		lines.append("No scores yet")
+	if not data is Array:
+		data = []
+	for i in 10:
+		if i < data.size():
+			lines.append("%2d.  %-8s  %d" % [i + 1, data[i]["name"], int(data[i]["score"])])
+		else:
+			lines.append("%2d.  --------  0" % [i + 1])
 	return "\n".join(lines)
 
 
