@@ -3,9 +3,8 @@ extends Control
 const LEADERBOARD_PATH := "user://leaderboard.json"
 
 @onready var buttons: Control = %Buttons
-@onready var panels: Array[Control] = [%LeaderPanel, %InstructionPanel, %SettingsPanel]
+@onready var panels: Array[Control] = [%LeaderPanel, %SettingsPanel]
 @onready var leaderboard_text: Label = %LeaderboardText
-@onready var instructions_text: RichTextLabel = %InstructionsText
 @onready var pictures: Control = %Pictures
 var starting := false
 @export var min_db := -40.0   # slider at 0 (silent below this)
@@ -14,12 +13,8 @@ var starting := false
 func _ready() -> void:
 	%PlayButton.pressed.connect(_on_play)
 	%LeaderboardButton.pressed.connect(_open.bind(%LeaderPanel))
-	%InstructionsButton.pressed.connect(_open.bind(%InstructionPanel))
 	%SettingsButton.pressed.connect(_open.bind(%SettingsPanel))
 	%LeaderboardBack.pressed.connect(_close)
-	%InstructionsBack.pressed.connect(_close)
-	instructions_text.bbcode_enabled = true
-	instructions_text.text = _instructions()
 	_close()
 	%SettingsPanel.visibility_changed.connect(func() -> void:
 		if not %SettingsPanel.visible and not buttons.visible:
@@ -84,26 +79,3 @@ func _leaderboard() -> String:
 		else:
 			lines.append("%2d.  --------  0" % [i + 1])
 	return "\n".join(lines)
-
-# ---- Instructions ----
-func _instructions() -> String:
-	return "\n".join([
-		"[b]CONTROLS[/b]",
-		"Aim: tilt the controller (or left/right arrows)",
-		"Fire: [your fire key]    Reload: R",
-		"Switch ammo: 1 / 2    Sonar: [your sonar key]",
-		"Launch mini ship: [your launch key]",
-		"",
-		"[b]AMMO[/b]",
-		"Standard is fast. Heavy breaks shields.",
-		"",
-		"[b]PROBLEMS[/b]",
-		"[color=red]Red[/color]: gun overheating (slow fire)",
-		"[color=cyan]Blue[/color]: power failure (HUD offline)",
-		"[color=green]Green[/color]: oxygen leak (lose health)",
-		"[color=yellow]Yellow[/color]: hangar offline",
-		"White: shield failure (more damage taken)",
-		"",
-		"Shoot the heal ship to restore health.",
-		"Cloaked enemies need sonar to be seen.",
-	])

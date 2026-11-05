@@ -24,7 +24,7 @@ var results_ready := false
 @onready var settings_button: Button = %SettingsButton
 @onready var menu_button: Button = %MainMenuButton
 @onready var reload_bars: Array[ProgressBar] = [%ReloadNormal, %ReloadHeavy]
-
+@onready var launch_voice: AudioStreamPlayer = %LaunchVoices
 @export var shake_max_offset := 14.0   # pixels at full trauma
 @export var shake_decay := 2.5         # trauma lost per second
 @onready var hangar_left: Marker2D = %HangarLeft
@@ -365,6 +365,9 @@ func _launch_mini_ship() -> void:
 	var s := mini_ship_scene.instantiate() as MiniShip
 	add_child(s)
 	s.setup(door.global_position, station)
+	var rand_stream := launch_voice.stream as AudioStreamRandomizer
+	if rand_stream and rand_stream.streams_count > 0:
+		launch_voice.play()
 
 func _lose_lives(amount: int) -> void:
 	if game_over:
@@ -592,7 +595,7 @@ func _show_static_screen() -> void:
 	label.visible = true
 	if _qualifies():
 		entering_name = true
-		label.text = "GAME OVER\nScore: %d\nNew high score! Enter your name:" % score
+		label.text = "GAME OVER\nScore: %d\nNew high score! Enter 3 characters:" % score
 		name_entry.text = ""
 		name_entry.visible = true
 		name_entry.grab_focus()
