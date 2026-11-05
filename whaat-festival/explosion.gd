@@ -4,15 +4,15 @@ extends CPUParticles2D
 var size := 1.0
 var tint := Color(1.0, 0.6, 0.2)
 
-
-# parent should be the main scene (or any node at the origin that isn't hidden)
-static func spawn(parent: Node, pos: Vector2, size := 1.0, tint := Color(1.0, 0.6, 0.2)) -> void:
+static func spawn(parent: Node, pos: Vector2, p_size := 1.0, p_tint := Color(1.0, 0.6, 0.2)) -> void:
+	if not is_instance_valid(parent):
+		return
 	var e := Explosion.new()
-	e.size = size
-	e.tint = tint
+	e.size = p_size
+	e.tint = p_tint
+	e.position = pos
 	parent.add_child(e)
 	e.global_position = pos
-
 
 func _ready() -> void:
 	one_shot = true
@@ -31,7 +31,7 @@ func _ready() -> void:
 	z_index = 5
 
 	var ramp := Gradient.new()
-	ramp.set_color(0, Color(1.0, 1.0, 0.9, 1.0))        # white-hot core
+	ramp.set_color(0, Color(1.0, 1.0, 0.9, 1.0))           # white-hot core
 	ramp.set_color(1, Color(tint.r, tint.g, tint.b, 0.0))  # fades out in the tint color
 	ramp.add_point(0.3, tint)
 	color_ramp = ramp
@@ -41,4 +41,4 @@ func _ready() -> void:
 	material = m
 
 	emitting = true
-	get_tree().create_timer(lifetime + 0.2).timeout.connect(queue_free)
+	finished.connect(queue_free)
