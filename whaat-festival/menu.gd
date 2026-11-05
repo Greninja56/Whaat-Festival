@@ -10,7 +10,6 @@ const LEADERBOARD_PATH := "user://leaderboard.json"
 var starting := false
 @export var min_db := -40.0   # slider at 0 (silent below this)
 @export var max_db := 20.0     # slider at 1 (buses can go above 0 dB)
-@export var game_scene: PackedScene
 
 func _ready() -> void:
 	%PlayButton.pressed.connect(_on_play)
@@ -52,8 +51,7 @@ func _on_play() -> void:
 	var fade := create_tween()
 	fade.tween_property(%Music, "volume_db", -40.0, 4.0)
 	await boot.run()
-
-	get_tree().change_scene_to_packed(game_scene)
+	get_tree().change_scene_to_file("res://main.tscn")
 
 func _open(panel: Control) -> void:
 	buttons.visible = false

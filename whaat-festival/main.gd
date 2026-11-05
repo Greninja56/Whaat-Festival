@@ -19,7 +19,6 @@ var results_ready := false
 @export var token_time := 0.6
 @export var token_size := 6.0
 @export var token_color := Color(1.0, 0.85, 0.2)
-@export var menu_scene: PackedScene
 @export var reload_bar_size := Vector2(120, 10)
 @export var reload_bar_back := Color(0.1, 0.1, 0.1)
 
@@ -168,7 +167,7 @@ func _process(delta: float) -> void:
 		if not entering_name and Input.is_action_just_pressed("ui_accept"):
 			get_tree().reload_current_scene()
 		elif not entering_name and Input.is_action_just_pressed("ui_cancel"):
-			get_tree().change_scene_to_packed(menu_scene)
+			get_tree().change_scene_to_file("res://main_menu.tscn")
 		return
 	elapsed += delta
 	heal_timer -= delta

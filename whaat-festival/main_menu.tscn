@@ -3,7 +3,6 @@
 [ext_resource type="AudioStream" uid="uid://rhip1hcrfgln" path="res://MainMenu.wav" id="1_06t4h"]
 [ext_resource type="Texture2D" uid="uid://nlb24y44bf01" path="res://background_image.png" id="1_7vrkn"]
 [ext_resource type="Script" uid="uid://bk56wt0mgp64k" path="res://menu.gd" id="1_fu7sn"]
-[ext_resource type="PackedScene" uid="uid://wxd4lmoheoy2" path="res://main.tscn" id="2_qe12f"]
 [ext_resource type="Texture2D" uid="uid://ddaevaptyat1m" path="res://mini_ship.png" id="4_nlkkf"]
 [ext_resource type="PackedScene" uid="uid://bsinpsqt2rcq4" path="res://settings_panel.tscn" id="5_8qtwp"]
 [ext_resource type="Texture2D" uid="uid://bu5xsg08go3wn" path="res://normal.png" id="6_8qtwp"]
@@ -56,7 +55,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_fu7sn")
-game_scene = ExtResource("2_qe12f")
 
 [node name="Background" type="TextureRect" parent="." unique_id=1224291432]
 unique_name_in_owner = true
