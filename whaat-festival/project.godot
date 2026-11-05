@@ -18,6 +18,10 @@ config/features=PackedStringArray("4.7", "Forward Plus")
 
 buses/default_bus_layout="uid://ln42hifyxr1e"
 
+[autoload]
+
+Esp="*uid://do60ntmhld16v"
+
 [display]
 
 window/size/mode=3

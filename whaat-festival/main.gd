@@ -175,8 +175,10 @@ func _process(delta: float) -> void:
 		if not results_ready:
 			return
 		if not entering_name and Input.is_action_just_pressed("ui_accept"):
+			Esp.send("START")
 			get_tree().reload_current_scene()
 		elif not entering_name and Input.is_action_just_pressed("ui_cancel"):
+			Esp.send("STOP")
 			get_tree().change_scene_to_file("res://main_menu.tscn")
 		return
 	elapsed += delta
@@ -390,6 +392,7 @@ func _end_game() -> void:
 	settings_panel.close()
 	turret.ui_open = false
 	settings_button.visible = false
+	Esp.send("STOP")
 	turret.process_mode = Node.PROCESS_MODE_DISABLED
 	for e in get_tree().get_nodes_in_group("enemies"):
 		e.queue_free()

@@ -51,6 +51,7 @@ func _on_play() -> void:
 	var fade := create_tween()
 	fade.tween_property(%Music, "volume_db", -40.0, 4.0)
 	await boot.run()
+	Esp.send("START")
 	get_tree().change_scene_to_file("res://main.tscn")
 
 func _open(panel: Control) -> void:
