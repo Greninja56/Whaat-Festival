@@ -8,6 +8,8 @@
 [ext_resource type="FontFile" uid="uid://rknobyegmyc6" path="res://Space_Mono/SpaceMono-Bold.ttf" id="5_dy7ct"]
 [ext_resource type="Texture2D" uid="uid://bu5xsg08go3wn" path="res://normal.png" id="6_8qtwp"]
 [ext_resource type="Texture2D" uid="uid://c1ph0maqo12nd" path="res://ThomasShipBiggerEven.png" id="6_qe12f"]
+[ext_resource type="Texture2D" uid="uid://haq5urqdpvqc" path="res://bullet.png" id="7_0o4t1"]
+[ext_resource type="Texture2D" uid="uid://mwtnkmek3ec5" path="res://slow_enemy.png" id="7_dy7ct"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fu7sn"]
 bg_color = Color(0.52156866, 0.6745098, 0.24313726, 1)
@@ -213,6 +215,206 @@ rotation = 1.5707964
 scale = Vector2(0.3, 0.3)
 texture = ExtResource("4_nlkkf")
 
+[node name="TitleFighter4" type="TextureRect" parent="Pictures" unique_id=697780644]
+layout_mode = 0
+offset_left = 576.0
+offset_top = 313.0
+offset_right = 698.0
+offset_bottom = 435.0
+rotation = 0.62752736
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("4_nlkkf")
+
+[node name="TitleFighter5" type="TextureRect" parent="Pictures" unique_id=1808865483]
+layout_mode = 0
+offset_left = 562.0
+offset_top = 250.99997
+offset_right = 684.0
+offset_bottom = 373.0
+rotation = 0.66590786
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("4_nlkkf")
+
+[node name="TitleFighter6" type="TextureRect" parent="Pictures" unique_id=1840919876]
+layout_mode = 0
+offset_left = 642.00006
+offset_top = 315.00003
+offset_right = 764.00006
+offset_bottom = 437.00003
+rotation = 0.49380273
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("4_nlkkf")
+
+[node name="TitleBullet" type="TextureRect" parent="Pictures" unique_id=206278832]
+layout_mode = 0
+offset_left = 603.99994
+offset_top = 278.99997
+offset_right = 1212.0
+offset_bottom = 887.0
+rotation = 0.49380273
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet2" type="TextureRect" parent="Pictures" unique_id=1209687715]
+layout_mode = 0
+offset_left = 601.0
+offset_top = 311.00003
+offset_right = 1209.0
+offset_bottom = 919.0
+rotation = 0.49380273
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet3" type="TextureRect" parent="Pictures" unique_id=2062308093]
+layout_mode = 0
+offset_left = 643.0
+offset_top = 281.00003
+offset_right = 1251.0
+offset_bottom = 889.0
+rotation = 0.49380273
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet4" type="TextureRect" parent="Pictures" unique_id=351540096]
+layout_mode = 0
+offset_left = 591.0
+offset_top = 243.99998
+offset_right = 1199.0
+offset_bottom = 852.0
+rotation = 0.49380273
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet5" type="TextureRect" parent="Pictures" unique_id=2081655850]
+layout_mode = 0
+offset_left = 618.0
+offset_top = 252.00003
+offset_right = 1226.0
+offset_bottom = 860.0
+rotation = 0.49380273
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet6" type="TextureRect" parent="Pictures" unique_id=878307223]
+layout_mode = 0
+offset_left = 622.99994
+offset_top = 305.99997
+offset_right = 1231.0
+offset_bottom = 914.0
+rotation = 0.49380273
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet7" type="TextureRect" parent="Pictures" unique_id=2022678981]
+layout_mode = 0
+offset_left = 673.99994
+offset_top = 248.99997
+offset_right = 1282.0
+offset_bottom = 857.0
+rotation = 0.49380273
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet8" type="TextureRect" parent="Pictures" unique_id=1289717587]
+layout_mode = 0
+offset_left = 622.0
+offset_top = 216.0
+offset_right = 1230.0
+offset_bottom = 824.0
+rotation = 0.49380273
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet9" type="TextureRect" parent="Pictures" unique_id=1472453027]
+layout_mode = 0
+offset_left = 702.99994
+offset_top = 537.0
+offset_right = 1311.0
+offset_bottom = 1145.0
+rotation = 1.5787086
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet10" type="TextureRect" parent="Pictures" unique_id=1125437380]
+layout_mode = 0
+offset_left = 732.00006
+offset_top = 531.0
+offset_right = 1340.0001
+offset_bottom = 1139.0
+rotation = 1.5787086
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet11" type="TextureRect" parent="Pictures" unique_id=1626657444]
+layout_mode = 0
+offset_left = 652.00006
+offset_top = 569.0
+offset_right = 1260.0001
+offset_bottom = 1177.0
+rotation = 1.5787086
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet12" type="TextureRect" parent="Pictures" unique_id=848737783]
+layout_mode = 0
+offset_left = 669.00006
+offset_top = 549.0
+offset_right = 1277.0001
+offset_bottom = 1157.0
+rotation = 1.5787086
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet13" type="TextureRect" parent="Pictures" unique_id=1902765848]
+layout_mode = 0
+offset_left = 727.00006
+offset_top = 560.0
+offset_right = 1335.0001
+offset_bottom = 1168.0
+rotation = 1.5787086
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet14" type="TextureRect" parent="Pictures" unique_id=687049806]
+layout_mode = 0
+offset_left = 692.00006
+offset_top = 514.0
+offset_right = 1300.0001
+offset_bottom = 1122.0
+rotation = 1.5787086
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet15" type="TextureRect" parent="Pictures" unique_id=1064085882]
+layout_mode = 0
+offset_left = 681.00006
+offset_top = 590.0
+offset_right = 1289.0001
+offset_bottom = 1198.0
+rotation = 1.5787086
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBullet16" type="TextureRect" parent="Pictures" unique_id=1684681116]
+layout_mode = 0
+offset_left = 754.00006
+offset_top = 523.0
+offset_right = 1362.0001
+offset_bottom = 1131.0
+rotation = 1.5787086
+scale = Vector2(0.02, 0.02)
+texture = ExtResource("7_0o4t1")
+
+[node name="TitleBigEnemy" type="TextureRect" parent="Pictures" unique_id=1271940899]
+layout_mode = 0
+offset_left = 696.0
+offset_top = -22.0
+offset_right = 1740.0
+offset_bottom = 1150.0
+rotation = 0.5013505
+scale = Vector2(0.19, 0.19)
+texture = ExtResource("7_dy7ct")
+
 [node name="Cruiser" type="TextureRect" parent="Pictures" unique_id=816535395]
 layout_mode = 0
 offset_left = 50.000008
@@ -290,6 +492,7 @@ offset_top = -2.0
 offset_right = 677.0
 offset_bottom = 499.0
 theme_override_colors/font_color = Color(0.88228846, 0.7087309, 0, 1)
+theme_override_fonts/font = ExtResource("5_dy7ct")
 theme_override_font_sizes/font_size = 100
 text = "Defenders
 of
