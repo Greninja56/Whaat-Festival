@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://bk56wt0mgp64k" path="res://menu.gd" id="1_fu7sn"]
 [ext_resource type="Texture2D" uid="uid://ddaevaptyat1m" path="res://mini_ship.png" id="4_nlkkf"]
 [ext_resource type="PackedScene" uid="uid://bsinpsqt2rcq4" path="res://settings_panel.tscn" id="5_8qtwp"]
+[ext_resource type="FontFile" uid="uid://rknobyegmyc6" path="res://Space_Mono/SpaceMono-Bold.ttf" id="5_dy7ct"]
 [ext_resource type="Texture2D" uid="uid://bu5xsg08go3wn" path="res://normal.png" id="6_8qtwp"]
 [ext_resource type="Texture2D" uid="uid://c1ph0maqo12nd" path="res://ThomasShipBiggerEven.png" id="6_qe12f"]
 
@@ -175,7 +176,8 @@ offset_left = 46.0
 offset_top = 22.0
 offset_right = 677.0
 offset_bottom = 465.0
-theme_override_colors/font_color = Color(0.79396534, 8.278489e-06, 0.5157072, 1)
+theme_override_colors/font_color = Color(0.6968625, 0.55845875, 0, 1)
+theme_override_fonts/font = ExtResource("5_dy7ct")
 theme_override_font_sizes/font_size = 30
 text = "The Republic needs you!"
 horizontal_alignment = 1
@@ -287,9 +289,9 @@ offset_left = 46.0
 offset_top = -2.0
 offset_right = 677.0
 offset_bottom = 499.0
-theme_override_colors/font_color = Color(0.8357069, 0, 0.24231723, 1)
+theme_override_colors/font_color = Color(0.88228846, 0.7087309, 0, 1)
 theme_override_font_sizes/font_size = 100
-text = "Defenders 
-of 
+text = "Defenders
+of
 Whaaat"
 horizontal_alignment = 1
