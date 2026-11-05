@@ -42,11 +42,23 @@ bg_color = Color(0.06373504, 0.48548496, 0, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1u8w0"]
 bg_color = Color(0.9321602, 0.27132592, 0.17650697, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_51irs"]
+bg_color = Color(0.52156866, 0.6745098, 0.24313726, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r5n0m"]
+bg_color = Color(0.039215688, 0.33333334, 0.49803922, 1)
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pa267"]
 shader = ExtResource("21_getpj")
 shader_parameter/tint = Color(1, 0, 0, 1)
 shader_parameter/strength = 0.0
 shader_parameter/edge_size = 0.3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vpvrv"]
+bg_color = Color(0.52156866, 0.6745098, 0.24313726, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pa267"]
+bg_color = Color(0.039215688, 0.33333334, 0.49803922, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lswn8"]
 shader = ExtResource("25_0odxb")
@@ -218,6 +230,27 @@ offset_bottom = 157.0
 scale = Vector2(0.21, 0.21)
 texture = ExtResource("12_a6jrf")
 
+[node name="MainMenuButton" type="Button" parent="HUD" unique_id=1014529571]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(160, 44)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -167.0
+offset_top = -48.0
+offset_right = -7.0
+offset_bottom = -4.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_51irs")
+theme_override_styles/hover = SubResource("StyleBoxFlat_r5n0m")
+text = "Main Menu"
+
 [node name="SpawnTimer" type="Timer" parent="." unique_id=795384298]
 unique_name_in_owner = true
 wait_time = 5.0
@@ -315,6 +348,25 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(520, 330)
 size_flags_horizontal = 3
 size_flags_vertical = 3
+
+[node name="SettingsButton" type="Button" parent="SettingsLayer" unique_id=831910746]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 36)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -548.0
+offset_bottom = -512.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_vpvrv")
+theme_override_styles/hover = SubResource("StyleBoxFlat_pa267")
+text = "Settings"
 
 [node name="StaticLayer" type="CanvasLayer" parent="." unique_id=710943915]
 unique_name_in_owner = true

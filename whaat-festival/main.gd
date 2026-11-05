@@ -6,7 +6,7 @@ extends Node2D
 @onready var settings_panel: PanelContainer = %SettingsPanel
 @export_range(0.0, 1.0) var heavy_chance := 0.3
 @export_range(0.0, 1.0) var cloaked_chance := 0.2
-@export var static_delay := 0.8   # seconds after the final blast before the static cuts in
+@export var static_delay := 0.1   # seconds after the final blast before the static cuts in
 @onready var static_rect: ColorRect = %StaticRect
 var results_ready := false
 @export var base_hp := 3
@@ -21,7 +21,8 @@ var results_ready := false
 @export var token_color := Color(1.0, 0.85, 0.2)
 @export var reload_bar_size := Vector2(120, 10)
 @export var reload_bar_back := Color(0.1, 0.1, 0.1)
-
+@onready var settings_button: Button = %SettingsButton
+@onready var menu_button: Button = %MainMenuButton
 @onready var reload_bars: Array[ProgressBar] = [%ReloadNormal, %ReloadHeavy]
 
 @export var shake_max_offset := 14.0   # pixels at full trauma
@@ -156,6 +157,15 @@ func _ready() -> void:
 	settings_panel.visibility_changed.connect(func() -> void:
 		turret.ui_open = settings_panel.visible)
 	static_rect.visible = false
+	settings_button.pressed.connect(func() -> void:
+		settings_panel.toggle()
+		turret.ui_open = settings_panel.visible)
+	settings_button.mouse_entered.connect(func() -> void: turret.ui_open = true)
+	settings_button.mouse_exited.connect(func() -> void: turret.ui_open = settings_panel.visible)
+	settings_panel.visibility_changed.connect(func() -> void:
+		settings_button.visible = not settings_panel.visible and not game_over)
+	menu_button.pressed.connect(func() -> void:
+		get_tree().change_scene_to_file("res://main_menu.tscn"))
 	_style_end_screen()
 
 
@@ -379,6 +389,7 @@ func _end_game() -> void:
 	edge_tint.visible = false
 	settings_panel.close()
 	turret.ui_open = false
+	settings_button.visible = false
 	turret.process_mode = Node.PROCESS_MODE_DISABLED
 	for e in get_tree().get_nodes_in_group("enemies"):
 		e.queue_free()
@@ -461,9 +472,10 @@ func _on_name_submitted(text: String) -> void:
 
 
 func _show_results() -> void:
-	label.text = "GAME OVER  Score: %d\nEnter: restart    Esc: menu" % score
+	label.text = "GAME OVER\nScore: %d\n" % score
 	leaderboard_label.text = _leaderboard_text()
 	leaderboard_label.visible = true
+	menu_button.visible = true
 
 
 func _leaderboard_text() -> String:
@@ -571,7 +583,7 @@ func _show_static_screen() -> void:
 	# power failure hides the whole HUD, so restore it, then hide everything except the end screen
 	hud.visible = true
 	for child in hud.get_children():
-		if child is CanvasItem and child != label and child != leaderboard_label and child != name_entry:
+		if child is CanvasItem and child != label and child != leaderboard_label and child != name_entry and child != menu_button:
 			child.visible = false
 
 	label.visible = true
