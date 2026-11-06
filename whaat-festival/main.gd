@@ -34,10 +34,10 @@ const NAME_LENGTH := 3
 @export var shield_hp := 3.0
 
 @export_group("Player")
-@export var max_lives := 10
+@export var max_lives := 50
 @export var enemy_damage := 2
 @export var oxygen_tick := 1.0
-@export var oxygen_damage := 2
+@export var oxygen_damage := 1
 @export var shield_damage_mult := 1.5
 
 @export_group("Mini Ships")
@@ -68,9 +68,10 @@ const NAME_LENGTH := 3
 @export var tint_pulse := true
 
 @export_group("Game Over")
-@export var death_blasts := 24
-@export var death_blast_gap := 0.08
+@export var death_blasts := 40
+@export var death_blast_gap := 0.02
 @export var static_delay := 0.1
+@onready var ship: TextureRect = $Ship
 
 var elapsed := 0.0
 var lives := 0
@@ -481,7 +482,7 @@ func _death_explosions() -> void:
 	var tween := create_tween()
 	for i in death_blasts:
 		tween.tween_callback(func() -> void:
-			var pos := center + Vector2(randf_range(-view.x * 0.35, view.x * 0.35), randf_range(-view.y * 0.3, 40.0))
+			var pos := _random_point_on_ship()
 			var col := Color(1.0, randf_range(0.2, 0.7), 0.1)
 			Explosion.spawn(self, pos, randf_range(1.5, 3.5), col)
 			_shake(0.25)
@@ -604,4 +605,13 @@ func _spawn_token(world_pos: Vector2, value: float) -> void:
 	tween.tween_callback(func() -> void:
 		_add_currency(value)
 		t.queue_free()
+	)
+
+func _random_point_on_ship() -> Vector2:
+	var rect := Rect2(ship.global_position, ship.size * ship.scale)
+	var view := get_viewport_rect()
+	rect = rect.intersection(view)
+	return Vector2(
+		randf_range(rect.position.x, rect.end.x),
+		randf_range(rect.position.y, rect.end.y)
 	)
