@@ -3,7 +3,7 @@ extends Area2D
 
 signal collected(amount: int)
 
-@export var speed := 300.0
+@export var speed := 275.0
 @export var max_hp := 2.0
 @export var heal_amount := 5
 @export var heal_color := Color(0.4, 1.0, 0.5)

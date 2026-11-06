@@ -11,7 +11,7 @@ enum State { LAUNCH, ACTIVE, RETURN }
 @export var bullet_scene: PackedScene
 @export var fire_rate := 1.5
 @export var bullet_speed := 400.0
-@export var damage := 0.3
+@export var damage := 0.4
 @export var aim_at_enemies := true
 
 @export_group("Muzzle Flash")

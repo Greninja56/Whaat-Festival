@@ -4,8 +4,8 @@ extends ColorRect
 @export var text_color := Color(0.3, 1.0, 0.4)
 @export var font_size := 20
 @export var final_hold := 2.5
-@export var line_delay_min := 0.1
-@export var line_delay_max := 0.8
+@export var line_delay_min := 0.01
+@export var line_delay_max := 1.0
 @export var final_char_delay := 0.07
 @export var blink_interval := 0.4
 
