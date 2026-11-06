@@ -3,29 +3,40 @@ extends Node2D
 
 enum State { LAUNCH, ACTIVE, RETURN }
 
+@export_group("Movement")
 @export var travel_speed := 300.0
-
-var state := State.LAUNCH
-var home := Vector2.ZERO      # hangar position
-var station := Vector2.ZERO   # where it hovers and shoots
-
-@export var bullet_scene: PackedScene
 @export var lifetime := 15.0
-@export var fire_rate := 1.5     # shots per second
+
+@export_group("Weapon")
+@export var bullet_scene: PackedScene
+@export var fire_rate := 1.5
 @export var bullet_speed := 400.0
-@export var damage := 0.5
-@export var aim_at_enemies := true  # false = always shoot straight up
+@export var damage := 0.3
+@export var aim_at_enemies := true
+
+@export_group("Muzzle Flash")
 @export var flash_size := 10.0
 @export var flash_time := 0.1
 @export var flash_color := Color(1.0, 0.904, 0.99, 1.0)
 
-@onready var muzzle: Marker2D = %Muzzle
-@onready var shoot_sound: AudioStreamPlayer2D = $Shoot
-var aim_dir := Vector2.UP   # last direction aimed; reused when there's no target
-
+var state := State.LAUNCH
+var home := Vector2.ZERO
+var station := Vector2.ZERO
+var aim_dir := Vector2.UP
 var age := 0.0
 var cooldown := 0.0
+var trail: FuelTrail
 
+@onready var muzzle: Marker2D = %Muzzle
+@onready var shoot_sound: AudioStreamPlayer2D = $Shoot
+
+func _ready() -> void:
+	trail = FuelTrail.attach(self, Vector2.DOWN, Vector2(0, 12), Color.WHITE, 10.0)
+
+func setup(from: Vector2, to: Vector2) -> void:
+	home = from
+	station = to
+	global_position = from
 
 func _process(delta: float) -> void:
 	trail.emitting = state != State.ACTIVE
@@ -34,7 +45,7 @@ func _process(delta: float) -> void:
 			if _fly_to(station, delta):
 				state = State.ACTIVE
 				rotation = 0.0
-				cooldown = 0.0   # fire as soon as it arrives
+				cooldown = 0.0
 		State.ACTIVE:
 			age += delta
 			if age >= lifetime:
@@ -48,12 +59,10 @@ func _process(delta: float) -> void:
 			if _fly_to(home, delta):
 				queue_free()
 
-
-# Moves toward the target at travel_speed. Returns true once it has arrived.
 func _fly_to(target: Vector2, delta: float) -> bool:
 	var to := target - global_position
 	if to.length() > 1.0:
-		rotation = to.angle() + PI / 2.0   # face the direction of travel
+		rotation = to.angle() + PI / 2.0
 	global_position = global_position.move_toward(target, travel_speed * delta)
 	return global_position.distance_to(target) < 1.0
 
@@ -66,48 +75,45 @@ func _shoot() -> void:
 		if target:
 			aim_dir = _lead_direction(target)
 
-	rotation = aim_dir.angle() + PI / 2.0   # always face the aim direction
+	rotation = aim_dir.angle() + PI / 2.0
 	_flash()
 
-	var b := bullet_scene.instantiate() as Bullet
-	b.velocity = aim_dir * bullet_speed
-	b.damage = damage
-	get_tree().current_scene.add_child(b)
-	b.global_position = muzzle.global_position
-	b.global_rotation = muzzle.global_rotation
-
+	var bullet := bullet_scene.instantiate() as Bullet
+	bullet.velocity = aim_dir * bullet_speed
+	bullet.damage = damage
+	get_tree().current_scene.add_child(bullet)
+	bullet.global_position = muzzle.global_position
+	bullet.global_rotation = muzzle.global_rotation
 
 func _lead_direction(target: Enemy) -> Vector2:
 	var d := target.global_position - global_position
-	var v := Vector2(0.0, target.speed)   # enemies only move straight down
+	var v := Vector2(0.0, target.speed)
 
-	# Solve |d + v*t| = bullet_speed * t for the time t of impact
-	var a := v.dot(v) - bullet_speed * bullet_speed
-	var b := 2.0 * d.dot(v)
-	var c := d.dot(d)
+	var qa := v.dot(v) - bullet_speed * bullet_speed
+	var qb := 2.0 * d.dot(v)
+	var qc := d.dot(d)
 
 	var t := 0.0
-	if absf(a) < 0.001:
-		if absf(b) > 0.001:
-			t = -c / b
+	if absf(qa) < 0.001:
+		if absf(qb) > 0.001:
+			t = -qc / qb
 	else:
-		var disc := b * b - 4.0 * a * c
+		var disc := qb * qb - 4.0 * qa * qc
 		if disc >= 0.0:
 			var sq := sqrt(disc)
-			var t1 := (-b - sq) / (2.0 * a)
-			var t2 := (-b + sq) / (2.0 * a)
+			var t1 := (-qb - sq) / (2.0 * qa)
+			var t2 := (-qb + sq) / (2.0 * qa)
 			t = minf(t1, t2) if (t1 > 0.0 and t2 > 0.0) else maxf(t1, t2)
 
 	if t <= 0.0:
-		return d.normalized()   # no valid intercept, aim directly
+		return d.normalized()
 	return (d + v * t).normalized()
-
 
 func _find_target() -> Enemy:
 	var best: Enemy = null
 	var best_dist := INF
-	for e in get_tree().get_nodes_in_group("enemies"):
-		var enemy := e as Enemy
+	for node in get_tree().get_nodes_in_group("enemies"):
+		var enemy := node as Enemy
 		if enemy == null:
 			continue
 		var dist := global_position.distance_to(enemy.global_position)
@@ -115,14 +121,15 @@ func _find_target() -> Enemy:
 			best_dist = dist
 			best = enemy
 	return best
-	
+
 func _flash() -> void:
-	var f := Polygon2D.new()
 	var pts := PackedVector2Array()
 	for i in 8:
 		var ang := TAU * i / 8.0
 		var r := flash_size if i % 2 == 0 else flash_size * 0.45
 		pts.append(Vector2(cos(ang), sin(ang)) * r)
+
+	var f := Polygon2D.new()
 	f.polygon = pts
 	f.color = flash_color
 	muzzle.add_child(f)
@@ -130,13 +137,3 @@ func _flash() -> void:
 	var tween := create_tween()
 	tween.tween_property(f, "modulate:a", 0.0, flash_time)
 	tween.tween_callback(f.queue_free)
-	
-func setup(from: Vector2, to: Vector2) -> void:
-	home = from
-	station = to
-	global_position = from
-
-var trail: FuelTrail
-
-func _ready() -> void:
-	trail = FuelTrail.attach(self, Vector2.DOWN, Vector2(0, 12), Color(1.0, 1.0, 1.0, 1.0), 10.0)

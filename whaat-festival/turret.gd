@@ -2,31 +2,30 @@ class_name Turret
 extends Node2D
 
 signal status_changed(text: String)
-var ui_open := false
-@export var bullet_scene: PackedScene
-@export var bullet_parent: Node
 
+@export_group("Aiming")
 @export var max_angle_deg := 80.0
 @export var physical_range_deg := 40.0
-@export var port := 50000
 @export var smooth := 20.0
 @export var deadzone_deg := 0.5
 @export var key_speed_deg := 120.0
 @export var key_hold_ms := 300
-@export var debug_print := false
-@export var hold_to_fire := true
 
+@export_group("Input")
+@export var port := 50000
+@export var hold_to_fire := true
+@export var debug_print := false
+
+@export_group("Weapons")
+@export var bullet_scene: PackedScene
+@export var bullet_parent: Node
+@export var overheat_fire_mult := 0.3
+
+@export_group("Sonar")
 @export var sonar_scene: PackedScene
 @export var sonar_speed := 225.0
 @export var sonar_max_charges := 3
 @export var sonar_full_recharge_time := 20.0
-var sonar_charges := 0
-var sonar_progress := 0.0
-
-@export var overheat_fire_mult := 0.3   # 0.3 = 30% of normal fire rate
-var overheated := false
-
-@onready var gun: Marker2D = %Gun
 
 var ammo_types: Array[Dictionary] = [
 	{"name": "Standard", "damage": 1, "shield_damage": 0.1, "mag": 30, "fire_rate": 8.0,
@@ -34,26 +33,33 @@ var ammo_types: Array[Dictionary] = [
 	{"name": "Heavy", "damage": 3, "shield_damage": 3.0, "mag": 6, "fire_rate": 2.0,
 	 "reload": 2.0, "speed": 450.0, "color": Color(1.0, 0.4, 0.2), "scale": 3.0, "flash_size": 22.0, "flash_time": 0.1},
 ]
-@onready var shoot_sounds: Array[AudioStreamPlayer2D] = [%Standard, %Heavy]
-@onready var sonar_sound: AudioStreamPlayer2D = %Sonar
-@onready var empty_gun: AudioStreamPlayer2D = %Empty
-@onready var reload_sound: AudioStreamPlayer2D = %Reloading
-@onready var switch_sound: AudioStreamPlayer2D = %Switch
+
+var ui_open := false
+var overheated := false
 
 var udp := PacketPeerUDP.new()
-var cooldown := 0.0
-var keyboard_until_ms := 0
+var packet_count := 0
 var raw_yaw := 0.0
 var center_yaw := 0.0
 var centered := false
 var flip := -1.0
 var target_angle := 0.0
-var packet_count := 0
+var keyboard_until_ms := 0
 
 var current := 0
 var mags: Array[int] = []
+var cooldown := 0.0
 var reload_left := 0.0
 
+var sonar_charges := 0
+var sonar_progress := 0.0
+
+@onready var gun: Marker2D = %Gun
+@onready var shoot_sounds: Array[AudioStreamPlayer2D] = [%Standard, %Heavy]
+@onready var sonar_sound: AudioStreamPlayer2D = %Sonar
+@onready var empty_gun: AudioStreamPlayer2D = %Empty
+@onready var reload_sound: AudioStreamPlayer2D = %Reloading
+@onready var switch_sound: AudioStreamPlayer2D = %Switch
 
 func _ready() -> void:
 	if udp.bind(port) != OK:
@@ -63,6 +69,8 @@ func _ready() -> void:
 	sonar_charges = sonar_max_charges
 	status_changed.emit.call_deferred(status_text())
 
+func _exit_tree() -> void:
+	udp.close()
 
 func _process(delta: float) -> void:
 	_read_packets()
@@ -78,6 +86,27 @@ func _process(delta: float) -> void:
 		else:
 			_try_empty_click()
 
+func _unhandled_input(event: InputEvent) -> void:
+	if not hold_to_fire and event.is_action_pressed("fire"):
+		if _can_shoot():
+			_shoot()
+		else:
+			_try_empty_click()
+	elif event.is_action_pressed("center"):
+		center_yaw = raw_yaw
+		target_angle = 0.0
+	elif event.is_action_pressed("flip"):
+		flip = -flip
+	elif event.is_action_pressed("reload"):
+		_start_reload()
+	elif event.is_action_pressed("ammo_1"):
+		_switch_to(0)
+	elif event.is_action_pressed("ammo_2"):
+		_switch_to(1)
+	elif event.is_action_pressed("ammo_next"):
+		_switch_to((current + 1) % ammo_types.size())
+	elif event.is_action_pressed("sonar") and sonar_charges > 0:
+		_fire_sonar()
 
 func _read_packets() -> void:
 	while udp.get_available_packet_count() > 0:
@@ -88,7 +117,6 @@ func _read_packets() -> void:
 		var data = JSON.parse_string(text)
 		if data is Dictionary and data.has("sensordata"):
 			_handle(data["sensordata"])
-
 
 func _read_keyboard(delta: float) -> void:
 	if ui_open:
@@ -102,18 +130,6 @@ func _read_keyboard(delta: float) -> void:
 		target_angle + key_axis * deg_to_rad(key_speed_deg) * delta,
 		-limit, limit
 	)
-
-
-func _update_reload(delta: float) -> void:
-	if reload_left <= 0.0:
-		return
-	reload_left -= delta
-	if reload_left <= 0.0:
-		reload_left = 0.0
-		reload_sound.stop()
-		mags[current] = ammo_types[current]["mag"]
-		status_changed.emit(status_text())
-
 
 func _handle(s: Dictionary) -> void:
 	if debug_print:
@@ -141,53 +157,8 @@ func _handle(s: Dictionary) -> void:
 	var t := clampf(d_deg / physical_range_deg, -1.0, 1.0)
 	target_angle = t * deg_to_rad(max_angle_deg)
 
-
-func _unhandled_input(event: InputEvent) -> void:
-	if not hold_to_fire and event.is_action_pressed("fire"):
-		if _can_shoot():
-			_shoot()
-		else:
-			_try_empty_click()
-	elif event.is_action_pressed("center"):
-		center_yaw = raw_yaw
-		target_angle = 0.0
-	elif event.is_action_pressed("flip"):
-		flip = -flip
-	elif event.is_action_pressed("reload"):
-		_start_reload()
-	elif event.is_action_pressed("ammo_1"):
-		_switch_to(0)
-	elif event.is_action_pressed("ammo_2"):
-		_switch_to(1)
-	elif event.is_action_pressed("ammo_next"):
-		_switch_to((current + 1) % ammo_types.size())
-	elif event.is_action_pressed("sonar") and sonar_charges > 0:
-		_fire_sonar()
-
-
-func _switch_to(index: int) -> void:
-	if index == current or index >= ammo_types.size():
-		return
-	current = index
-	reload_left = 0.0
-	reload_sound.stop()
-	switch_sound.play()
-	cooldown = 0.15
-	status_changed.emit(status_text())
-
-
-func _start_reload() -> void:
-	if reload_left > 0.0 or mags[current] >= ammo_types[current]["mag"]:
-		return
-	reload_left = ammo_types[current]["reload"]
-	reload_sound.pitch_scale = reload_sound.stream.get_length() / reload_left
-	reload_sound.play()
-	status_changed.emit(status_text())
-
-
 func _can_shoot() -> bool:
 	return reload_left <= 0.0 and cooldown <= 0.0 and mags[current] > 0
-
 
 func _shoot() -> void:
 	var ammo := ammo_types[current]
@@ -213,15 +184,63 @@ func _shoot() -> void:
 
 	status_changed.emit(status_text())
 
+func _try_empty_click() -> void:
+	if mags[current] > 0 or reload_left > 0.0 or cooldown > 0.0:
+		return
+	empty_gun.play()
+	cooldown = 0.3
 
-func status_text() -> String:
-	var parts: Array[String] = []
-	for i in ammo_types.size():
-		var a := ammo_types[i]
-		parts.append("%s %d/%d" % [a["name"], mags[i], a["mag"]])
-	parts.append("Sonar %d/%d" % [sonar_charges, sonar_max_charges])
-	return "\n".join(parts)
-	
+func _switch_to(index: int) -> void:
+	if index == current or index >= ammo_types.size():
+		return
+	current = index
+	reload_left = 0.0
+	reload_sound.stop()
+	switch_sound.play()
+	cooldown = 0.15
+	status_changed.emit(status_text())
+
+func _start_reload() -> void:
+	if reload_left > 0.0 or mags[current] >= ammo_types[current]["mag"]:
+		return
+	reload_left = ammo_types[current]["reload"]
+	reload_sound.pitch_scale = reload_sound.stream.get_length() / reload_left
+	reload_sound.play()
+	status_changed.emit(status_text())
+
+func _update_reload(delta: float) -> void:
+	if reload_left <= 0.0:
+		return
+	reload_left -= delta
+	if reload_left <= 0.0:
+		reload_left = 0.0
+		reload_sound.stop()
+		mags[current] = ammo_types[current]["mag"]
+		status_changed.emit(status_text())
+
+func reload_progress() -> float:
+	if reload_left <= 0.0:
+		return 0.0
+	return 1.0 - reload_left / ammo_types[current]["reload"]
+
+func _flash(ammo: Dictionary) -> void:
+	var flash_size: float = ammo["flash_size"]
+	var pts := PackedVector2Array()
+	for i in 8:
+		var ang := TAU * i / 8.0
+		var r := flash_size if i % 2 == 0 else flash_size * 0.45
+		pts.append(Vector2(cos(ang), sin(ang)) * r)
+
+	var f := Polygon2D.new()
+	f.polygon = pts
+	f.color = ammo["color"].lightened(0.5)
+	f.z_index = 1
+	gun.add_child(f)
+
+	var tween := create_tween()
+	tween.tween_property(f, "modulate:a", 0.0, ammo["flash_time"])
+	tween.tween_callback(f.queue_free)
+
 func _update_sonar(delta: float) -> void:
 	sonar_progress += delta
 	if sonar_progress >= sonar_full_recharge_time:
@@ -230,12 +249,11 @@ func _update_sonar(delta: float) -> void:
 			sonar_charges = sonar_max_charges
 			status_changed.emit(status_text())
 
-
 func _fire_sonar() -> void:
 	sonar_charges -= 1
 	sonar_sound.play()
 
-	var s := sonar_scene.instantiate()
+	var s := sonar_scene.instantiate() as SonarShot
 	s.velocity = Vector2.UP.rotated(global_rotation) * sonar_speed
 
 	var parent := bullet_parent if bullet_parent else get_tree().current_scene
@@ -244,37 +262,16 @@ func _fire_sonar() -> void:
 	s.global_rotation = global_rotation
 
 	status_changed.emit(status_text())
-	
+
 func set_overheated(value: bool) -> void:
 	overheated = value
 	modulate = Color(1.0, 0.3, 0.3) if value else Color.WHITE
 	status_changed.emit(status_text())
-	
-func _try_empty_click() -> void:
-	if mags[current] > 0 or reload_left > 0.0 or cooldown > 0.0:
-		return
-	empty_gun.play()
-	cooldown = 0.3   # stops the click repeating every frame while held
 
-func _flash(ammo: Dictionary) -> void:
-	var size: float = ammo["flash_size"]
-	var pts := PackedVector2Array()
-	for i in 8:
-		var ang := TAU * i / 8.0
-		var r := size if i % 2 == 0 else size * 0.45
-		pts.append(Vector2(cos(ang), sin(ang)) * r)
-
-	var f := Polygon2D.new()
-	f.polygon = pts
-	f.color = ammo["color"].lightened(0.5)   # brighter than the bullet
-	f.z_index = 1
-	gun.add_child(f)
-
-	var tween := create_tween()
-	tween.tween_property(f, "modulate:a", 0.0, ammo["flash_time"])
-	tween.tween_callback(f.queue_free)
-
-func reload_progress() -> float:
-	if reload_left <= 0.0:
-		return 0.0
-	return 1.0 - reload_left / ammo_types[current]["reload"]
+func status_text() -> String:
+	var parts: Array[String] = []
+	for i in ammo_types.size():
+		var a := ammo_types[i]
+		parts.append("%s %d/%d" % [a["name"], mags[i], a["mag"]])
+	parts.append("Sonar %d/%d" % [sonar_charges, sonar_max_charges])
+	return "\n".join(parts)

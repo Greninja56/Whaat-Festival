@@ -6,19 +6,22 @@ extends CPUParticles2D
 @export var star_count := 60
 @export var star_color := Color(1.0, 1.0, 1.0, 0.7)
 
+const SPAWN_MARGIN := 10.0
 
 func _ready() -> void:
-	var size := get_viewport_rect().size
-	position = Vector2(size.x * 0.5, -10.0)
+	var view := get_viewport_rect().size
+	var speed := maxf(fall_speed, 1.0)
+	
+	position = Vector2(view.x * 0.5, -SPAWN_MARGIN)
 	emission_shape = EMISSION_SHAPE_RECTANGLE
-	emission_rect_extents = Vector2(size.x * 0.5, 1.0)
+	emission_rect_extents = Vector2(view.x * 0.5, 1.0)
 	direction = Vector2.DOWN
 	spread = 0.0
 	gravity = Vector2.ZERO
-	initial_velocity_min = fall_speed
-	initial_velocity_max = fall_speed
-	lifetime = (size.y + 20.0) / fall_speed   # exactly one trip down the screen
-	preprocess = lifetime                     # stars are already spread out at game start
+	initial_velocity_min = speed
+	initial_velocity_max = speed
+	lifetime = (view.y + SPAWN_MARGIN * 2.0) / speed   # exactly one trip down the screen
+	preprocess = lifetime                              # stars are already spread out at game start
 	amount = star_count
 	scale_amount_min = star_size * 0.5
 	scale_amount_max = star_size
