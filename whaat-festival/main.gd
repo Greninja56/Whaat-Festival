@@ -15,16 +15,17 @@ const NAME_LENGTH := 3
 @export_group("Spawning")
 @export_range(0.0, 1.0) var heavy_chance := 0.3
 @export_range(0.0, 1.0) var cloaked_chance := 0.2
-@export var spawn_start := 10.0
-@export var spawn_min := 1.0
-@export var spawn_ramp := 0.01
+@export var spawn_start := 8.0
+@export var spawn_min := 0.8
+@export var spawn_ramp := 0.005
 @export var base_hp := 3
+@export var enemy_speed := 40.0
 @export var heavy_speed_mult := 0.25
 @export var heavy_hp_mult := 5
 @export var cloaked_speed_mult := 0.5
 @export var cloaked_hp_mult := 1
-@export var heal_spawn_min := 10.0
-@export var heal_spawn_max := 20.0
+@export var heal_spawn_min := 40.0
+@export var heal_spawn_max := 60.0
 
 @export_group("Shields")
 @export var shield_start_time := 180.0
@@ -360,7 +361,7 @@ func _spawn_enemy() -> void:
 	e.max_hp = base_hp * hp_mult
 	e.currency_value = coins
 	e.position = Vector2(randf_range(30.0, width - 30.0), -20.0)
-	e.speed = (60.0 + elapsed * 0.8) * speed_mult
+	e.speed = enemy_speed * speed_mult
 	e.bottom_y = turret.position.y
 	e.reached_bottom.connect(_on_enemy_reached_bottom)
 	e.died.connect(_on_enemy_died.bind(points))
