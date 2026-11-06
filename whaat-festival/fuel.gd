@@ -5,11 +5,11 @@ extends CPUParticles2D
 @export var trail_size := 4.0
 @export var trail_time := 0.4
 
-static func attach(ship: Node2D, dir: Vector2, offset: Vector2, color: Color, p_size: float) -> FuelTrail:
+static func attach(ship: Node2D, dir: Vector2, offset: Vector2, p_color: Color, p_size: float) -> FuelTrail:
 	var t := FuelTrail.new()
 	t.direction = dir
 	t.position = offset
-	t.trail_color = color
+	t.trail_color = p_color
 	t.trail_size = p_size
 	ship.add_child(t)
 	return t

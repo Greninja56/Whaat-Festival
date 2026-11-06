@@ -477,7 +477,6 @@ func _end_game() -> void:
 	_show_static_screen()
 
 func _death_explosions() -> void:
-	var view := get_viewport_rect().size
 	var center := turret.global_position
 
 	var tween := create_tween()
