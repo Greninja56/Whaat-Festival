@@ -272,6 +272,7 @@ func status_text() -> String:
 	var parts: Array[String] = []
 	for i in ammo_types.size():
 		var a := ammo_types[i]
-		parts.append("%s %d/%d" % [a["name"], mags[i], a["mag"]])
+		var marker := "> " if i == current else " "
+		parts.append("%s%s %d/%d" % [marker, a["name"], mags[i], a["mag"]])
 	parts.append("Sonar %d/%d" % [sonar_charges, sonar_max_charges])
 	return "\n".join(parts)
