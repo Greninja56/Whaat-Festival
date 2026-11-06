@@ -28,9 +28,9 @@ signal status_changed(text: String)
 @export var sonar_full_recharge_time := 20.0
 
 var ammo_types: Array[Dictionary] = [
-	{"name": "Standard", "damage": 1, "shield_damage": 0.1, "mag": 60, "fire_rate": 8.0,
+	{"name": "Standard", "damage": 1, "shield_damage": 0.1, "mag": 40, "fire_rate": 8.0,
 	 "reload": 1.2, "speed": 600.0, "color": Color(1.0, 0.9, 0.3), "scale": 1.0, "flash_size": 10.0, "flash_time": 0.05},
-	{"name": "Heavy", "damage": 3, "shield_damage": 3.0, "mag": 15, "fire_rate": 2.0,
+	{"name": "Heavy", "damage": 3, "shield_damage": 3.0, "mag": 9, "fire_rate": 2.0,
 	 "reload": 2.0, "speed": 450.0, "color": Color(1.0, 0.4, 0.2), "scale": 3.0, "flash_size": 22.0, "flash_time": 0.1},
 ]
 
