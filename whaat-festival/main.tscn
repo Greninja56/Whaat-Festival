@@ -26,6 +26,21 @@
 [ext_resource type="Shader" uid="uid://cfgpfrgudm2w1" path="res://main.gdshader" id="21_getpj"]
 [ext_resource type="Shader" uid="uid://cp3f5c4l6ghcx" path="res://static.gdshader" id="25_0odxb"]
 [ext_resource type="PackedScene" uid="uid://bsinpsqt2rcq4" path="res://settings_panel.tscn" id="25_lswn8"]
+[ext_resource type="AudioStream" uid="uid://85awgsvyqn7o" path="res://Voicelines/voice-recorder-2026-11-07--15-49-05.mp3" id="27_4lmeg"]
+[ext_resource type="AudioStream" uid="uid://cd1uilc4p08hx" path="res://Voicelines/voice-recorder-2026-11-07--15-50-08.mp3" id="28_0cp0l"]
+[ext_resource type="AudioStream" uid="uid://bvqqcei7ocmpk" path="res://Voicelines/voice-recorder-2026-11-07--15-54-56.mp3" id="29_d2t1y"]
+[ext_resource type="AudioStream" uid="uid://ddt5vbldsluio" path="res://Voicelines/voice-recorder-2026-11-07--15-55-59.mp3" id="30_gngh3"]
+[ext_resource type="AudioStream" uid="uid://b6r85ifg5nv0c" path="res://Voicelines/voice-recorder-2026-11-07--15-56-23.mp3" id="31_0n3wm"]
+[ext_resource type="AudioStream" uid="uid://blsijc1tn883v" path="res://Voicelines/voice-recorder-2026-11-07--15-57-27.mp3" id="32_qnost"]
+[ext_resource type="AudioStream" uid="uid://c5xe35xu3rkns" path="res://Voicelines/voice-recorder-2026-11-07--15-58-14.mp3" id="33_wnkbs"]
+[ext_resource type="AudioStream" uid="uid://poibnptbdk00" path="res://Voicelines/voice-recorder-2026-11-07--15-50-52.mp3" id="34_f6a44"]
+[ext_resource type="AudioStream" uid="uid://cvsi6js3r2d16" path="res://Voicelines/voice-recorder-2026-11-07--15-52-05.mp3" id="35_0cbny"]
+[ext_resource type="AudioStream" uid="uid://d348ysaselujb" path="res://Voicelines/voice-recorder-2026-11-07--15-52-20.mp3" id="36_hrvbo"]
+[ext_resource type="AudioStream" uid="uid://c6clw28380pwd" path="res://Voicelines/voice-recorder-2026-11-07--15-52-53.mp3" id="37_uypp3"]
+[ext_resource type="AudioStream" uid="uid://cs2lp50bhnm8t" path="res://Voicelines/voice-recorder-2026-11-07--15-53-22.mp3" id="38_blkrb"]
+[ext_resource type="AudioStream" uid="uid://chh8q5oj4pik" path="res://Voicelines/voice-recorder-2026-11-07--15-53-54.mp3" id="39_abqjc"]
+[ext_resource type="AudioStream" uid="uid://c822fgk1l6f8p" path="res://Voicelines/voice-recorder-2026-11-07--15-54-15.mp3" id="40_6iyjs"]
+[ext_resource type="AudioStream" uid="uid://ed1lvy2lhxy2" path="res://Voicelines/voice-recorder-2026-11-07--15-54-35.mp3" id="41_4w656"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7mycd"]
 bg_color = Color(1, 0, 0.14117648, 1)
@@ -69,7 +84,22 @@ shader_parameter/scanline_strength = 0.25
 shader_parameter/flicker_strength = 0.15
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_vpvrv"]
-streams_count = 1
+streams_count = 15
+stream_0/stream = ExtResource("27_4lmeg")
+stream_1/stream = ExtResource("28_0cp0l")
+stream_2/stream = ExtResource("34_f6a44")
+stream_3/stream = ExtResource("35_0cbny")
+stream_4/stream = ExtResource("36_hrvbo")
+stream_5/stream = ExtResource("37_uypp3")
+stream_6/stream = ExtResource("38_blkrb")
+stream_7/stream = ExtResource("39_abqjc")
+stream_8/stream = ExtResource("40_6iyjs")
+stream_9/stream = ExtResource("41_4w656")
+stream_10/stream = ExtResource("29_d2t1y")
+stream_11/stream = ExtResource("30_gngh3")
+stream_12/stream = ExtResource("31_0n3wm")
+stream_13/stream = ExtResource("32_qnost")
+stream_14/stream = ExtResource("33_wnkbs")
 
 [node name="Node2D" type="Node2D" unique_id=295050915]
 script = ExtResource("1_ig7tw")
